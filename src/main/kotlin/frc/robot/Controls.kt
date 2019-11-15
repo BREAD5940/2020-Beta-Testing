@@ -11,7 +11,8 @@ object Controls {
     val driverControllerLowLevel = XboxController(0)
     val driverFalconXbox = driverControllerLowLevel.mapControls {
 
-        button(kX).changeOn(InstantCommand(Runnable { "Hullo!" }))
+
+
     }
 
     val operatorWPIJoystick = XboxController(1)
