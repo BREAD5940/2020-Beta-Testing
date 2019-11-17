@@ -80,6 +80,7 @@ object DriveSubsystem : FalconSubsystem() {
         // update localization f a s t
         this.kinematicsUpdateJob = GlobalScope.launchFrequency(200) {
             updateState()
+            useState()
         }
     }
 
