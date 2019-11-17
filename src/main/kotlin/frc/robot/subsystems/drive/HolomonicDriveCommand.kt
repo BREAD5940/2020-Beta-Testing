@@ -26,18 +26,21 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
         val rotation = rotSource()
 
 
-        var translation = Translation2d(forward, strafe) * (12.0 * DriveSubsystem.feedForward.kV.value) // this will have a norm of 1
+        // calculate translation vector (with magnitude of the max speed
+        // volts divided by volts per meter per second is meters per second
+        var translation = Translation2d(forward, strafe) * (12.0 / DriveSubsystem.feedForward.kV.value) // this will have a norm of 1
         val magnitude = translation.norm
 
-        // snap translation power to poles
+        // snap translation power to poles if we're close to them
         if ((translation.toRotation2d().distance(translation.toRotation2d().nearestPole())).radians.absoluteValue
                 < Math.toRadians(10.0)) {
             translation = translation.toRotation2d().nearestPole().toTranslation() * magnitude
         }
 
-        // check evasion
-        if(evadingButton()) {
-            if(!wasEvading) {
+        // check evasion and determine wheels if necessary
+        val wantsEvasion = evadingButton()
+        if(wantsEvasion) {
+            if(!wasEvading) { // determine evasion wheels if we weren't previously evading. Doing this twice is a Bad Idea
                 wasEvading = true
                 determineEvasionWheels(translation, DriveSubsystem.periodicIO.pose)
             }
@@ -47,21 +50,29 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
             } else if (sign < -0.5) {
                 centerOfRotation = counterClockwiseCenter
             }
-        } else if (wasEvading) centerOfRotation = Translation2d()
+        } else  { // we don't want evasion
+            if (wasEvading) { // toggle out if we were previously evading
+                centerOfRotation = Translation2d()
+                wasEvading = false
+            }
+        }
 
+        // calculate wheel speeds from field oriented chassis state
         val speeds = ChassisSpeeds.fromFieldRelativeSpeeds(translation.x, translation.y, rotation, DriveSubsystem.periodicIO.pose.rotation)
         val moduleStates = DriveSubsystem.kinematics.toSwerveModuleStates(speeds, centerOfRotation)
+
+        // Normalize wheel speeds
         // volts per meter per second times meters per seconds gives volts
-        val maxAttainableSpeed = 12.0 -
-                moduleStates.map { it.speedMetersPerSecond }.max()!! * DriveSubsystem.feedForward.kV.value
-        SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates, maxAttainableSpeed)
+        SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates,
+                DriveSubsystem.feedForward.kV.value * 12.0)
 
         DriveSubsystem.periodicIO.output = DriveSubsystem.Output.KinematicsVelocity(moduleStates.toList())
     }
 
+    /** Determine which wheels to use to evade. */
     private fun determineEvasionWheels(driveVector: Translation2d, robotPosition: Pose2d) {
         val here: Translation2d = driveVector.rotateBy(robotPosition.rotation.inverse())
-        val wheels: List<Translation2d> = Constants.kModulePositions
+        val wheels = Constants.kModulePositions
         clockwiseCenter = wheels[0]
         counterClockwiseCenter = wheels[wheels.size - 1]
         for (i in 0 until wheels.size - 1) {
