@@ -58,22 +58,20 @@ class Mk2SwerveModule(
 
     fun useState() {
 
+        val customizedOutput = customizeAngle(periodicIO.desiredOutput)
+        azimuthController.setSetpoint(customizedOutput.angle.radians)
+        azimuthMotor.set(azimuthController.calculate(periodicIO.state.angle.radians, 0.020))
+
         // check if we should reverse the angle
-        when (val customizedOutput = customizeAngle(periodicIO.desiredOutput)) {
+        when (customizedOutput) {
             is Output.Nothing -> {
                 driveMotor.setNeutral()
-                azimuthController.setSetpoint(0.0)
-                azimuthMotor.set(azimuthController.calculate(periodicIO.state.angle.radians, 0.020))
             }
             is Output.Percent -> {
                 driveMotor.setDutyCycle(customizedOutput.percent)
-                azimuthController.setSetpoint(output.angle.radians)
-                azimuthMotor.set(azimuthController.calculate(periodicIO.state.angle.radians, 0.020))
             }
             is Output.Velocity -> {
                 driveMotor.setVelocity(customizedOutput.velocity, customizedOutput.arbitraryFeedForward)
-                azimuthController.setSetpoint(output.angle.radians)
-                azimuthMotor.set(azimuthController.calculate(periodicIO.state.angle.radians, 0.020))
             }
         }
     }
