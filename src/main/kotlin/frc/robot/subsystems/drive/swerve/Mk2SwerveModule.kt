@@ -52,23 +52,45 @@ class Mk2SwerveModule(azimuthPAMPort: Int, azimuthAnalogPort: Int, private val o
     }
 
     fun useState() {
-        when(val output = periodicIO.desiredOutput) {
+
+        // check if we should reverse the angle
+        when(val customizedOutput = customizeAngle(periodicIO.desiredOutput)) {
             is Output.Nothing -> {
                 driveMotor.setNeutral()
                 azimuthController.setSetpoint(0.0)
                 azimuthMotor.set(azimuthController.calculate(periodicIO.state.angle.radians, 0.020))
             }
             is Output.Percent -> {
-                driveMotor.setDutyCycle(output.percent)
+                driveMotor.setDutyCycle(customizedOutput.percent)
                 azimuthController.setSetpoint(output.angle.radians)
                 azimuthMotor.set(azimuthController.calculate(periodicIO.state.angle.radians, 0.020))
             }
             is Output.Velocity -> {
-                driveMotor.setVelocity(output.velocity, output.arbitraryFeedForward)
+                driveMotor.setVelocity(customizedOutput.velocity, customizedOutput.arbitraryFeedForward)
                 azimuthController.setSetpoint(output.angle.radians)
                 azimuthMotor.set(azimuthController.calculate(periodicIO.state.angle.radians, 0.020))
             }
         }
+    }
+
+    /**
+     * Decide if we should reverse the module
+     * if so, reverse it
+     */
+    private fun customizeAngle(output: Output): Output {
+        var targetAngle = output.angle
+        val currentAngle = periodicIO.state.angle
+
+        // Deltas that are greater than 90 deg or less than -90 deg can be
+        // inverted so the total movement of the module
+        // is less than 90 deg by inverting the wheel direction
+        val delta = targetAngle - currentAngle
+        if(delta.degrees > 90.0 || delta.degrees < -90.0) {
+            targetAngle += 180.degrees.toRotation2d()
+            output.reverse()
+        }
+        return output
+
     }
 
     protected class PeriodicIO {
@@ -77,20 +99,33 @@ class Mk2SwerveModule(azimuthPAMPort: Int, azimuthAnalogPort: Int, private val o
         var desiredOutput: Output = Output.Nothing
     }
 
-    public sealed class Output {
-        object Nothing : Output()
+    sealed class Output(val angle: Rotation2d) {
+
+        abstract fun reverse(): Output
+
+        object Nothing : Output(0.degrees.toRotation2d()) {
+            override fun reverse() = this
+        }
 
         class Percent(
                 val percent: Double,
-                val angle: Rotation2d
-        ) : Output()
+                angle: Rotation2d
+        ) : Output(angle) {
+            override fun reverse(): Output {
+                return Percent(-percent, angle + 180.degrees.toRotation2d())
+            }
+        }
 
         class Velocity(
                 val velocity: SIUnit<LinearVelocity>,
-                val angle: Rotation2d,
+                angle: Rotation2d,
                 val arbitraryFeedForward: SIUnit<Volt> = 0.volts
-        ): Output() {
+        ): Output(angle) {
             constructor() : this(0.meters.velocity, 0.degrees.toRotation2d(), 0.volts)
+            
+            override fun reverse(): Output {
+                return Velocity(-velocity, angle + 180.degrees.toRotation2d(), -arbitraryFeedForward)
+            }
         }
     }
 
