@@ -14,6 +14,7 @@ import frc.robot.Constants.baseLen
 import frc.robot.Constants.baseWidth
 import frc.robot.subsystems.drive.swerve.Mk2SwerveModule
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.Meter
 import org.ghrobotics.lib.mathematics.units.SIUnit
@@ -26,8 +27,6 @@ import org.ghrobotics.lib.motors.rev.FalconMAX
 import org.ghrobotics.lib.physics.MotorCharacterization
 import org.ghrobotics.lib.utils.asSource
 import org.ghrobotics.lib.utils.launchFrequency
-import wpilibj.controller.SimpleMotorFeedforward
-import java.util.*
 
 object DriveSubsystem : FalconSubsystem() {
 
@@ -79,11 +78,16 @@ object DriveSubsystem : FalconSubsystem() {
     override fun lateInit() {
 
         // update localization f a s t
-        GlobalScope.launchFrequency(200) {
+        this.kinematicsUpdateJob = GlobalScope.launchFrequency(200) {
             updateState()
         }
     }
 
+    override fun periodic() {
+        if (!kinematicsUpdateJob.isActive) kinematicsUpdateJob.start()
+    }
+
+    lateinit var kinematicsUpdateJob: Job
     private fun updateState() {
         modules.forEach { it.updateState() }
 
@@ -101,7 +105,7 @@ object DriveSubsystem : FalconSubsystem() {
     fun useState() {
         // switch over our wanted state
         // and set module positions/outputs accordingly
-        when(val output = periodicIO.output) {
+        when (val output = periodicIO.output) {
             is Output.Nothing -> {
                 modules.forEach { it.output = Mk2SwerveModule.Output.Nothing }
             }
@@ -159,22 +163,22 @@ object DriveSubsystem : FalconSubsystem() {
         object Nothing : Output()
 
         class Percent(
-                val chassisSpeed: ChassisSpeeds
+            val chassisSpeed: ChassisSpeeds
         ) : Output()
 
         class Velocity(
-                val chassisSpeed: ChassisSpeeds
+            val chassisSpeed: ChassisSpeeds
         ) : Output()
 
         class KinematicsVelocity(
-                val speeds: List<SwerveModuleState>
+            val speeds: List<SwerveModuleState>
         ) : Output()
 
         class TrajectoryTrackerOutput(
-                val flState: Mk2SwerveModule.Output.Velocity,
-                val frState: Mk2SwerveModule.Output.Velocity,
-                val blState: Mk2SwerveModule.Output.Velocity,
-                val brState: Mk2SwerveModule.Output.Velocity
+            val flState: Mk2SwerveModule.Output.Velocity,
+            val frState: Mk2SwerveModule.Output.Velocity,
+            val blState: Mk2SwerveModule.Output.Velocity,
+            val brState: Mk2SwerveModule.Output.Velocity
         ) : Output() {
             constructor() : this (
                     Mk2SwerveModule.Output.Velocity(),
@@ -184,5 +188,4 @@ object DriveSubsystem : FalconSubsystem() {
             )
         }
     }
-
 }

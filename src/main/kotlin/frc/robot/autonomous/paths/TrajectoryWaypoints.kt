@@ -60,10 +60,10 @@ object TrajectoryWaypoints {
     val kCenterStart = Pose2d(kStartX, 13.5.feet)
 
     data class Waypoint(
-            val trueLocation: Pose2d,
-            val transform: Pose2d = Pose2d(),
-            val translationalOffset: Translation2d = Translation2d(),
-            val rotationalOffset: Rotation2d = Rotation2d(0.0)
+        val trueLocation: Pose2d,
+        val transform: Pose2d = Pose2d(),
+        val translationalOffset: Translation2d = Translation2d(),
+        val rotationalOffset: Rotation2d = Rotation2d(0.0)
     ) {
 
         val trueAndTransform = trueLocation + transform

@@ -33,8 +33,6 @@ class PidController(private val kP: Double, private val kD: Double) {
         lastError = error
 
         return (kP * error + kD * derivative).coerceIn(minOutput, maxOutput)
-        //MathUtils.clamp(constants.p * error + constants.i * integral + constants.d * derivative,
-//                minOutput, maxOutput)
     }
 
     fun reset() {

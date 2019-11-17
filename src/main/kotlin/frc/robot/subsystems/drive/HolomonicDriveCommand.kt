@@ -6,16 +6,15 @@ import edu.wpi.first.wpilibj.geometry.Translation2d
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics
 import frc.robot.Controls
-import org.ghrobotics.lib.commands.FalconCommand
-import org.ghrobotics.lib.mathematics.units.derived.degrees
-import org.ghrobotics.lib.wrappers.hid.getX
-import org.ghrobotics.lib.wrappers.hid.getY
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.hypot
 import kotlin.math.sign
+import org.ghrobotics.lib.commands.FalconCommand
+import org.ghrobotics.lib.wrappers.hid.getX
+import org.ghrobotics.lib.wrappers.hid.getY
 
-class HolomonicDriveCommand: FalconCommand(DriveSubsystem) {
+class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
 
     override fun execute() {
         val forward = xSource()
@@ -26,7 +25,7 @@ class HolomonicDriveCommand: FalconCommand(DriveSubsystem) {
         val magnitude = translation.norm
 
         // snap translation power to poles
-        if((translation.toRotation2d().distance(translation.toRotation2d().nearestPole())).radians.absoluteValue
+        if ((translation.toRotation2d().distance(translation.toRotation2d().nearestPole())).radians.absoluteValue
                 < Math.toRadians(10.0)) {
             translation = translation.toRotation2d().nearestPole().toTranslation() * magnitude
         }
@@ -39,7 +38,6 @@ class HolomonicDriveCommand: FalconCommand(DriveSubsystem) {
         SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates, maxAttainableSpeed)
 
         DriveSubsystem.periodicIO.output = DriveSubsystem.Output.KinematicsVelocity(moduleStates.toList())
-
     }
 
     companion object {

@@ -12,7 +12,7 @@ import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.mathematics.units.SIUnit
 import org.ghrobotics.lib.utils.Source
 
-class SwerveTrajectoryFollowerCommand(val trajectorySupplier: Source<Trajectory>): FalconCommand(DriveSubsystem) {
+class SwerveTrajectoryFollowerCommand(val trajectorySupplier: Source<Trajectory>) : FalconCommand(DriveSubsystem) {
 
     private var prevStates = listOf<SwerveModuleState>()
     lateinit var trajectory: Trajectory
@@ -82,7 +82,6 @@ class SwerveTrajectoryFollowerCommand(val trajectorySupplier: Source<Trajectory>
         prevTime = time
         prevStates = states
     }
-
 }
 
 private fun Rotation2d.toTranslation2d() = Translation2d(this.cos, this.sin)
