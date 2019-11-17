@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.GenericHID
 import edu.wpi.first.wpilibj.geometry.Rotation2d
 import edu.wpi.first.wpilibj.geometry.Translation2d
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds
+import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics
 import frc.robot.Controls
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.mathematics.units.derived.degrees
@@ -31,8 +32,13 @@ class HolomonicDriveCommand: FalconCommand(DriveSubsystem) {
         }
 
         val speeds = ChassisSpeeds.fromFieldRelativeSpeeds(translation.x, translation.y, rotation, DriveSubsystem.gyro())
+        val moduleStates = DriveSubsystem.kinematics.toSwerveModuleStates(speeds, centerOfRotation)
+        // volts per meter per second times meters per seconds gives volts
+        val maxAttainableSpeed = 12.0 -
+                moduleStates.map { it.speedMetersPerSecond }.max()!! * DriveSubsystem.feedForward.kV.value
+        SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates, maxAttainableSpeed)
 
-        DriveSubsystem.periodicIO.output = DriveSubsystem.Output.Percent(speeds)
+        DriveSubsystem.periodicIO.output = DriveSubsystem.Output.KinematicsVelocity(moduleStates.toList())
 
     }
 
@@ -40,6 +46,8 @@ class HolomonicDriveCommand: FalconCommand(DriveSubsystem) {
         val xSource by lazy { Controls.driverFalconXbox.getY(GenericHID.Hand.kLeft) }
         val zSource by lazy { Controls.driverFalconXbox.getX(GenericHID.Hand.kLeft) }
         val rotSource by lazy { Controls.driverFalconXbox.getX(GenericHID.Hand.kRight) }
+
+        var centerOfRotation = Translation2d()
     }
 }
 

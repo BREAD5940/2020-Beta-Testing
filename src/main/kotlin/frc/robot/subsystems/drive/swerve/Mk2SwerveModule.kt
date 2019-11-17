@@ -1,4 +1,4 @@
-package frc.robot.subsystems.drive
+package frc.robot.subsystems.drive.swerve
 
 import com.revrobotics.CANSparkMaxLowLevel
 import edu.wpi.first.wpilibj.AnalogInput
@@ -60,12 +60,12 @@ class Mk2SwerveModule(azimuthPAMPort: Int, azimuthAnalogPort: Int, private val o
             }
             is Output.Percent -> {
                 driveMotor.setDutyCycle(output.percent)
-                azimuthController.setSetpoint(output.angle.inRadians())
+                azimuthController.setSetpoint(output.angle.radians)
                 azimuthMotor.set(azimuthController.calculate(periodicIO.state.angle.radians, 0.020))
             }
-            is Output.Velcity -> {
-                driveMotor.setVelocity(output.velocity)
-                azimuthController.setSetpoint(output.angle.inRadians())
+            is Output.Velocity -> {
+                driveMotor.setVelocity(output.velocity, output.arbitraryFeedForward)
+                azimuthController.setSetpoint(output.angle.radians)
                 azimuthMotor.set(azimuthController.calculate(periodicIO.state.angle.radians, 0.020))
             }
         }
@@ -77,7 +77,7 @@ class Mk2SwerveModule(azimuthPAMPort: Int, azimuthAnalogPort: Int, private val o
         var desiredOutput: Output = Output.Nothing
     }
 
-    sealed class Output {
+    public sealed class Output {
         object Nothing : Output()
 
         class Percent(
@@ -85,10 +85,13 @@ class Mk2SwerveModule(azimuthPAMPort: Int, azimuthAnalogPort: Int, private val o
                 val angle: Rotation2d
         ) : Output()
 
-        class Velcity(
+        class Velocity(
                 val velocity: SIUnit<LinearVelocity>,
-                val angle: Rotation2d
-        ): Output()
+                val angle: Rotation2d,
+                val arbitraryFeedForward: SIUnit<Volt> = 0.volts
+        ): Output() {
+            constructor() : this(0.meters.velocity, 0.degrees.toRotation2d(), 0.volts)
+        }
     }
 
 }

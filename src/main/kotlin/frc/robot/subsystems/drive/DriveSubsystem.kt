@@ -9,7 +9,10 @@ import edu.wpi.first.wpilibj.geometry.Translation2d
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry
+import edu.wpi.first.wpilibj.kinematics.SwerveModuleState
+import frc.robot.subsystems.drive.swerve.Mk2SwerveModule
 import org.ghrobotics.lib.commands.FalconSubsystem
+import org.ghrobotics.lib.mathematics.units.Meter
 import org.ghrobotics.lib.mathematics.units.SIUnit
 import org.ghrobotics.lib.mathematics.units.derived.radians
 import org.ghrobotics.lib.mathematics.units.inMeters
@@ -17,7 +20,9 @@ import org.ghrobotics.lib.mathematics.units.inches
 import org.ghrobotics.lib.mathematics.units.nativeunit.SlopeNativeUnitModel
 import org.ghrobotics.lib.mathematics.units.nativeunit.nativeUnits
 import org.ghrobotics.lib.motors.rev.FalconMAX
+import org.ghrobotics.lib.physics.MotorCharacterization
 import org.ghrobotics.lib.utils.asSource
+import wpilibj.controller.SimpleMotorFeedforward
 
 object DriveSubsystem : FalconSubsystem() {
 
@@ -46,7 +51,15 @@ object DriveSubsystem : FalconSubsystem() {
             CANSparkMax(13, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0001)
 
-    private val modules = listOf(flModule, frModule, blModule, brModule)
+    val modules = listOf(flModule, frModule, blModule, brModule)
+
+    val feedForward = MotorCharacterization<Meter>(
+            SIUnit(0.8),
+            SIUnit(0.1),
+            SIUnit(0.5)
+    ).apply {
+        TODO("idk -- need to tune dis. Should be per module!")
+    }
 
     val kinematics = SwerveDriveKinematics(
             Translation2d(baseWidth.inMeters() / 2.0, baseLen.inMeters() / 2.0),
@@ -55,7 +68,7 @@ object DriveSubsystem : FalconSubsystem() {
             Translation2d(-baseWidth.inMeters() / 2.0, -baseLen.inMeters() / 2.0)
     )
 
-    val odometry = SwerveDriveOdometry(kinematics, Pose2d())
+    private val odometry = SwerveDriveOdometry(kinematics, Pose2d())
 
     val periodicIO = PeriodicIO()
 
@@ -81,7 +94,10 @@ object DriveSubsystem : FalconSubsystem() {
                 modules.forEach { it.output = Mk2SwerveModule.Output.Nothing }
             }
             is Output.Percent -> {
+                // normalize wheel speeds
                 val states = kinematics.toSwerveModuleStates(output.chassisSpeed)
+                SwerveDriveKinematics.normalizeWheelSpeeds(states, 1.0)
+
                 modules.forEachIndexed { index, module ->
                     module.output = Mk2SwerveModule.Output.Percent(states[index].speedMetersPerSecond, states[index].angle)
                 }
@@ -89,10 +105,36 @@ object DriveSubsystem : FalconSubsystem() {
             is Output.Velocity -> {
                 val states = kinematics.toSwerveModuleStates(output.chassisSpeed)
                 modules.forEachIndexed { index, module ->
-                    module.output = Mk2SwerveModule.Output.Velcity(SIUnit(states[index].speedMetersPerSecond), states[index].angle)
+                    module.output = Mk2SwerveModule.Output.Velocity(SIUnit(states[index].speedMetersPerSecond), states[index].angle)
                 }
             }
+            is Output.KinematicsVelocity -> {
+                flModule.output = Mk2SwerveModule.Output.Velocity(
+                        SIUnit(output.speeds[0].speedMetersPerSecond),
+                        output.speeds[0].angle
+                )
+                frModule.output = Mk2SwerveModule.Output.Velocity(
+                        SIUnit(output.speeds[1].speedMetersPerSecond),
+                        output.speeds[1].angle
+                )
+                blModule.output = Mk2SwerveModule.Output.Velocity(
+                        SIUnit(output.speeds[2].speedMetersPerSecond),
+                        output.speeds[2].angle
+                )
+                brModule.output = Mk2SwerveModule.Output.Velocity(
+                        SIUnit(output.speeds[3].speedMetersPerSecond),
+                        output.speeds[3].angle
+                )
+            }
+            is Output.TrajectoryTrackerOutput -> {
+                flModule.output = output.flState
+                frModule.output = output.frState
+                blModule.output = output.blState
+                brModule.output = output.brState
+            }
         }
+
+        modules.forEach { it.useState() }
     }
 
     class PeriodicIO {
@@ -111,6 +153,24 @@ object DriveSubsystem : FalconSubsystem() {
         class Velocity(
                 val chassisSpeed: ChassisSpeeds
         ) : Output()
+
+        class KinematicsVelocity(
+                val speeds: List<SwerveModuleState>
+        ) : Output()
+
+        class TrajectoryTrackerOutput(
+                val flState: Mk2SwerveModule.Output.Velocity,
+                val frState: Mk2SwerveModule.Output.Velocity,
+                val blState: Mk2SwerveModule.Output.Velocity,
+                val brState: Mk2SwerveModule.Output.Velocity
+        ) : Output() {
+            constructor() : this (
+                    Mk2SwerveModule.Output.Velocity(),
+                    Mk2SwerveModule.Output.Velocity(),
+                    Mk2SwerveModule.Output.Velocity(),
+                    Mk2SwerveModule.Output.Velocity()
+            )
+        }
     }
 
 }

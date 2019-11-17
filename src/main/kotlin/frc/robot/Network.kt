@@ -8,7 +8,7 @@ package frc.robot
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab
-import frc.robot.auto.Autonomous
+import frc.robot.autonomous.Autonomous
 import org.ghrobotics.lib.wrappers.networktables.enumSendableChooser
 
 object Network {
