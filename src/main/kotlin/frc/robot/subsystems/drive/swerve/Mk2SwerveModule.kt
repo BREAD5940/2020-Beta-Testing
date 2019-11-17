@@ -12,66 +12,39 @@ import org.ghrobotics.lib.mathematics.units.* // ktlint-disable no-wildcard-impo
 import org.ghrobotics.lib.mathematics.units.derived.* // ktlint-disable no-wildcard-imports
 import org.ghrobotics.lib.motors.rev.FalconMAX
 
-class Mk2SwerveModule(
-    azimuthPAMPort: Int,
-    azimuthAnalogPort: Int,
-    private val offset: SIUnit<Radian>,
-    val driveMotor: FalconMAX<Meter>,
-    angleKp: Double,
-    angleKd: Double
-) {
+class Mk2SwerveModule {
 
     private val stateMutex = Object()
     protected val periodicIO = PeriodicIO()
         get() = synchronized(stateMutex) { field }
 
     val state get() = periodicIO.state
-    var output: Output
+    var output: Output.Velocity
         get() = periodicIO.desiredOutput
         set(value) { periodicIO.desiredOutput = value }
 
-    private val azimuthMotor = Spark(azimuthPAMPort)
-    private val azimuthController = PidController(angleKp, angleKd).apply {
-        setInputRange(0.0, 2.0 * PI)
-        setContinuous(true)
-        setOutputRange(-0.5, 0.5)
-    }
-
-    private val analogInput = AnalogInput(azimuthAnalogPort)
-    val azimuthAngle =
-            { ((1.0 - analogInput.voltage / RobotController.getVoltage5V() * 2.0 * PI).radians + offset).toRotation2d() }
-
-    init {
-        driveMotor.canSparkMax.apply {
-            setSmartCurrentLimit(60)
-            setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 500)
-            setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 3)
-        }
-    }
-
     fun updateState() {
-        periodicIO.distance = driveMotor.encoder.position
         periodicIO.state = SwerveModuleState(
-                driveMotor.encoder.velocity.value,
-                azimuthAngle())
+                periodicIO.desiredOutput.velocity.value,
+                periodicIO.desiredOutput.angle)
     }
 
     fun useState() {
 
         val customizedOutput = customizeAngle(periodicIO.desiredOutput)
-        azimuthController.setSetpoint(customizedOutput.angle.radians)
-        azimuthMotor.set(azimuthController.calculate(periodicIO.state.angle.radians, 0.020))
+//        azimuthController.setSetpoint(customizedOutput.angle.radians)
+//        azimuthMotor.set(azimuthController.calculate(periodicIO.state.angle.radians, 0.020))
 
         // check if we should reverse the angle
         when (customizedOutput) {
             is Output.Nothing -> {
-                driveMotor.setNeutral()
+//                driveMotor.setNeutral()
             }
-            is Output.Percent -> {
-                driveMotor.setDutyCycle(customizedOutput.percent)
-            }
+//            is Output.Percent -> {
+////                driveMotor.setDutyCycle(customizedOutput.percent)
+//            }
             is Output.Velocity -> {
-                driveMotor.setVelocity(customizedOutput.velocity, customizedOutput.arbitraryFeedForward)
+//                driveMotor.setVelocity(customizedOutput.velocity, customizedOutput.arbitraryFeedForward)
             }
         }
     }
@@ -96,29 +69,22 @@ class Mk2SwerveModule(
     }
 
     protected class PeriodicIO {
-        var distance = 0.meters
+        // the current state
         var state = SwerveModuleState()
-        var desiredOutput: Output = Output.Nothing
+
+        // the desired state
+        var desiredOutput: Output.Velocity = Output.Nothing
     }
 
     sealed class Output(val angle: Rotation2d) {
 
         abstract fun reverse(): Output
 
-        object Nothing : Output(0.degrees.toRotation2d()) {
+        object Nothing : Velocity(SIUnit(0.0), 0.degrees.toRotation2d()) {
             override fun reverse() = this
         }
 
-        class Percent(
-            val percent: Double,
-            angle: Rotation2d
-        ) : Output(angle) {
-            override fun reverse(): Output {
-                return Percent(-percent, angle + 180.degrees.toRotation2d())
-            }
-        }
-
-        class Velocity(
+        open class Velocity(
             val velocity: SIUnit<LinearVelocity>,
             angle: Rotation2d,
             val arbitraryFeedForward: SIUnit<Volt> = 0.volts

@@ -4,6 +4,7 @@ import com.kauailabs.navx.frc.AHRS
 import com.revrobotics.CANSparkMax
 import com.revrobotics.CANSparkMaxLowLevel
 import edu.wpi.first.wpilibj.SPI
+import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.geometry.Pose2d
 import edu.wpi.first.wpilibj.geometry.Translation2d
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds
@@ -20,6 +21,7 @@ import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.Meter
 import org.ghrobotics.lib.mathematics.units.SIUnit
 import org.ghrobotics.lib.mathematics.units.derived.radians
+import org.ghrobotics.lib.mathematics.units.derived.toRotation2d
 import org.ghrobotics.lib.mathematics.units.inMeters
 import org.ghrobotics.lib.mathematics.units.inches
 import org.ghrobotics.lib.mathematics.units.nativeunit.SlopeNativeUnitModel
@@ -31,27 +33,28 @@ import org.ghrobotics.lib.utils.launchFrequency
 
 object DriveSubsystem : FalconSubsystem() {
 
-    val gyro = AHRS(SPI.Port.kMXP).asSource()
+//    val gyro = AHRS(SPI.Port.kMXP).asSource()
+
 
     private val driveNativeUnitModel = SlopeNativeUnitModel(
             1.inches,
             (1.0 / (4.0 * Math.PI / 60.0 * 15.0 / 20.0 * 24.0 / 38.0 * 18.0)).nativeUnits)
 
-    private val flModule = Mk2SwerveModule(0, 0, 0.radians, FalconMAX(
-            CANSparkMax(10, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
-            0.5, 0.0001)
+    private val flModule = Mk2SwerveModule()//0, 0, 0.radians, FalconMAX(
+//            CANSparkMax(10, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
+//            0.5, 0.0001)
 
-    private val frModule = Mk2SwerveModule(1, 1, 0.radians, FalconMAX(
-            CANSparkMax(11, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
-            0.5, 0.0001)
+    private val frModule = Mk2SwerveModule()//1, 1, 0.radians, FalconMAX(
+//            CANSparkMax(11, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
+//            0.5, 0.0001)
 
-    private val blModule = Mk2SwerveModule(2, 2, 0.radians, FalconMAX(
-            CANSparkMax(12, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
-            0.5, 0.0001)
+    private val blModule = Mk2SwerveModule()//2, 2, 0.radians, FalconMAX(
+//            CANSparkMax(12, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
+//            0.5, 0.0001)
 
-    private val brModule = Mk2SwerveModule(3, 3, 0.radians, FalconMAX(
-            CANSparkMax(13, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
-            0.5, 0.0001)
+    private val brModule = Mk2SwerveModule()//3, 3, 0.radians, FalconMAX(
+//            CANSparkMax(13, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
+//            0.5, 0.0001)
 
     val modules = listOf(flModule, frModule, blModule, brModule)
 
@@ -83,13 +86,16 @@ object DriveSubsystem : FalconSubsystem() {
             updateState()
             useState()
         }
+
+        lastUpdateTime = Timer.getFPGATimestamp()
     }
 
     override fun periodic() {
         if (!kinematicsUpdateJob.isActive) kinematicsUpdateJob.start()
     }
 
-    lateinit var kinematicsUpdateJob: Job
+    private var kinematicsUpdateJob: Job
+    private var lastUpdateTime = 0.0
     private fun updateState() {
         modules.forEach { it.updateState() }
 
@@ -100,8 +106,19 @@ object DriveSubsystem : FalconSubsystem() {
                 brModule.state,
                 blModule.state)
 
-        periodicIO.pose = odometry.update(gyro(), states[0], states[1], states[2], states[3])
+        val now = Timer.getFPGATimestamp()
+        val dt = now - lastUpdateTime
+
+
+
         periodicIO.speed = kinematics.toChassisSpeeds(states[0], states[1], states[2], states[3])
+        periodicIO.pose = odometry.update(periodicIO.pose.rotation, states[0], states[1], states[2], states[3])
+        periodicIO.pose = Pose2d(
+                periodicIO.pose.translation,
+                periodicIO.pose.rotation + (periodicIO.speed.omegaRadiansPerSecond * dt).radians.toRotation2d()
+        )
+
+        lastUpdateTime = now
     }
 
     fun useState() {
@@ -111,15 +128,15 @@ object DriveSubsystem : FalconSubsystem() {
             is Output.Nothing -> {
                 modules.forEach { it.output = Mk2SwerveModule.Output.Nothing }
             }
-            is Output.Percent -> {
-                // normalize wheel speeds
-                val states = kinematics.toSwerveModuleStates(output.chassisSpeed)
-                SwerveDriveKinematics.normalizeWheelSpeeds(states, 1.0)
-
-                modules.forEachIndexed { index, module ->
-                    module.output = Mk2SwerveModule.Output.Percent(states[index].speedMetersPerSecond, states[index].angle)
-                }
-            }
+//            is Output.Percent -> {
+//                // normalize wheel speeds
+//                val states = kinematics.toSwerveModuleStates(output.chassisSpeed)
+//                SwerveDriveKinematics.normalizeWheelSpeeds(states, 1.0)
+//
+//                modules.forEachIndexed { index, module ->
+//                    module.output = Mk2SwerveModule.Output.Percent(states[index].speedMetersPerSecond, states[index].angle)
+//                }
+//            }
             is Output.Velocity -> {
                 val states = kinematics.toSwerveModuleStates(output.chassisSpeed)
                 modules.forEachIndexed { index, module ->
@@ -164,9 +181,9 @@ object DriveSubsystem : FalconSubsystem() {
     sealed class Output {
         object Nothing : Output()
 
-        class Percent(
-            val chassisSpeed: ChassisSpeeds
-        ) : Output()
+//        class Percent(
+//            val chassisSpeed: ChassisSpeeds
+//        ) : Output()
 
         class Velocity(
             val chassisSpeed: ChassisSpeeds
