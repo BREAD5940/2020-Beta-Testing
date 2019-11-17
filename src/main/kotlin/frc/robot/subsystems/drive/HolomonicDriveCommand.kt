@@ -63,8 +63,8 @@ fun Translation2d.toRotation2d(): Rotation2d {
 }
 
 fun Rotation2d.nearestPole(): Rotation2d {
-    var pole_sin = 0.0
-    var pole_cos = 0.0
+    var pole_sin: Double
+    var pole_cos: Double
     if (abs(cos) > abs(sin)) {
         pole_cos = sign(cos)
         pole_sin = 0.0

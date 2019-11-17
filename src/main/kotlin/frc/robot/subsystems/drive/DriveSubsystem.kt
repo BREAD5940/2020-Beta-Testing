@@ -10,7 +10,10 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState
+import frc.robot.Constants.baseLen
+import frc.robot.Constants.baseWidth
 import frc.robot.subsystems.drive.swerve.Mk2SwerveModule
+import kotlinx.coroutines.GlobalScope
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.Meter
 import org.ghrobotics.lib.mathematics.units.SIUnit
@@ -22,12 +25,11 @@ import org.ghrobotics.lib.mathematics.units.nativeunit.nativeUnits
 import org.ghrobotics.lib.motors.rev.FalconMAX
 import org.ghrobotics.lib.physics.MotorCharacterization
 import org.ghrobotics.lib.utils.asSource
+import org.ghrobotics.lib.utils.launchFrequency
 import wpilibj.controller.SimpleMotorFeedforward
+import java.util.*
 
 object DriveSubsystem : FalconSubsystem() {
-
-    private val baseWidth = 24.inches // TODO check
-    private val baseLen = 24.inches // TODO check
 
     val gyro = AHRS(SPI.Port.kMXP).asSource()
 
@@ -68,11 +70,21 @@ object DriveSubsystem : FalconSubsystem() {
             Translation2d(-baseWidth.inMeters() / 2.0, -baseLen.inMeters() / 2.0)
     )
 
-    private val odometry = SwerveDriveOdometry(kinematics, Pose2d())
+    internal val odometry = SwerveDriveOdometry(kinematics, Pose2d())
 
+    private val stateLock = Object()
     val periodicIO = PeriodicIO()
+        get() = synchronized(stateLock) { field }
 
-    fun updateState() {
+    override fun lateInit() {
+
+        // update localization f a s t
+        GlobalScope.launchFrequency(200) {
+            updateState()
+        }
+    }
+
+    private fun updateState() {
         modules.forEach { it.updateState() }
 
         // Update odometry

@@ -3,6 +3,7 @@ package frc.robot
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandScheduler
+import frc.robot.autonomous.Autonomous
 import frc.robot.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.wrappers.FalconTimedRobot
 
@@ -12,6 +13,7 @@ object Robot : FalconTimedRobot() {
 
     override fun robotInit() {
         Network // at the top because s3ndable choosers need to be instantiated
+        Autonomous
 
         // + for subsystems
         +DriveSubsystem
@@ -28,6 +30,8 @@ object Robot : FalconTimedRobot() {
     }
 
     override fun robotPeriodic() {
+        Autonomous.update()
+        Controls.update()
     }
 
     override fun disabledInit() {
