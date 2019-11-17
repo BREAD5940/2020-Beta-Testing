@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState
+import frc.robot.Constants
 import frc.robot.Constants.baseLen
 import frc.robot.Constants.baseWidth
 import frc.robot.subsystems.drive.swerve.Mk2SwerveModule
@@ -63,10 +64,10 @@ object DriveSubsystem : FalconSubsystem() {
     }
 
     val kinematics = SwerveDriveKinematics(
-            Translation2d(baseWidth.inMeters() / 2.0, baseLen.inMeters() / 2.0),
-            Translation2d(baseWidth.inMeters() / 2.0, -baseLen.inMeters() / 2.0),
-            Translation2d(-baseWidth.inMeters() / 2.0, baseLen.inMeters() / 2.0),
-            Translation2d(-baseWidth.inMeters() / 2.0, -baseLen.inMeters() / 2.0)
+            Constants.kModulePositions[0],
+            Constants.kModulePositions[1],
+            Constants.kModulePositions[2],
+            Constants.kModulePositions[3]
     )
 
     internal val odometry = SwerveDriveOdometry(kinematics, Pose2d())
@@ -96,8 +97,8 @@ object DriveSubsystem : FalconSubsystem() {
         val states = listOf(
                 flModule.state,
                 frModule.state,
-                blModule.state,
-                brModule.state)
+                brModule.state,
+                blModule.state)
 
         periodicIO.pose = odometry.update(gyro(), states[0], states[1], states[2], states[3])
         periodicIO.speed = kinematics.toChassisSpeeds(states[0], states[1], states[2], states[3])
@@ -134,11 +135,11 @@ object DriveSubsystem : FalconSubsystem() {
                         SIUnit(output.speeds[1].speedMetersPerSecond),
                         output.speeds[1].angle
                 )
-                blModule.output = Mk2SwerveModule.Output.Velocity(
+                brModule.output = Mk2SwerveModule.Output.Velocity(
                         SIUnit(output.speeds[2].speedMetersPerSecond),
                         output.speeds[2].angle
                 )
-                brModule.output = Mk2SwerveModule.Output.Velocity(
+                blModule.output = Mk2SwerveModule.Output.Velocity(
                         SIUnit(output.speeds[3].speedMetersPerSecond),
                         output.speeds[3].angle
                 )
@@ -146,8 +147,8 @@ object DriveSubsystem : FalconSubsystem() {
             is Output.TrajectoryTrackerOutput -> {
                 flModule.output = output.flState
                 frModule.output = output.frState
-                blModule.output = output.blState
                 brModule.output = output.brState
+                blModule.output = output.blState
             }
         }
 
