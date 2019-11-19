@@ -66,7 +66,7 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
         SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates,
                 DriveSubsystem.feedForward.kV.value * 12.0)
 
-        DriveSubsystem.periodicIO.output = DriveSubsystem.Output.KinematicsVelocity(moduleStates.toList())
+        DriveSubsystem.periodicIO.output = SwerveDriveOutput.KinematicsVelocity(moduleStates.toList())
     }
 
     /** Determine which wheels to use to evade. */

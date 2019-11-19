@@ -5,14 +5,11 @@ import com.revrobotics.CANSparkMax
 import com.revrobotics.CANSparkMaxLowLevel
 import edu.wpi.first.wpilibj.SPI
 import edu.wpi.first.wpilibj.geometry.Pose2d
-import edu.wpi.first.wpilibj.geometry.Translation2d
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState
 import frc.robot.Constants
-import frc.robot.Constants.baseLen
-import frc.robot.Constants.baseWidth
 import frc.robot.subsystems.drive.swerve.Mk2SwerveModule
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -20,7 +17,6 @@ import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.Meter
 import org.ghrobotics.lib.mathematics.units.SIUnit
 import org.ghrobotics.lib.mathematics.units.derived.radians
-import org.ghrobotics.lib.mathematics.units.inMeters
 import org.ghrobotics.lib.mathematics.units.inches
 import org.ghrobotics.lib.mathematics.units.nativeunit.SlopeNativeUnitModel
 import org.ghrobotics.lib.mathematics.units.nativeunit.nativeUnits
@@ -108,10 +104,10 @@ object DriveSubsystem : FalconSubsystem() {
         // switch over our wanted state
         // and set module positions/outputs accordingly
         when (val output = periodicIO.output) {
-            is Output.Nothing -> {
+            is SwerveDriveOutput.Nothing -> {
                 modules.forEach { it.output = Mk2SwerveModule.Output.Nothing }
             }
-            is Output.Percent -> {
+            is SwerveDriveOutput.Percent -> {
                 // normalize wheel speeds
                 val states = kinematics.toSwerveModuleStates(output.chassisSpeed)
                 SwerveDriveKinematics.normalizeWheelSpeeds(states, 1.0)
@@ -120,13 +116,13 @@ object DriveSubsystem : FalconSubsystem() {
                     module.output = Mk2SwerveModule.Output.Percent(states[index].speedMetersPerSecond, states[index].angle)
                 }
             }
-            is Output.Velocity -> {
+            is SwerveDriveOutput.Velocity -> {
                 val states = kinematics.toSwerveModuleStates(output.chassisSpeed)
                 modules.forEachIndexed { index, module ->
                     module.output = Mk2SwerveModule.Output.Velocity(SIUnit(states[index].speedMetersPerSecond), states[index].angle)
                 }
             }
-            is Output.KinematicsVelocity -> {
+            is SwerveDriveOutput.KinematicsVelocity -> {
                 flModule.output = Mk2SwerveModule.Output.Velocity(
                         SIUnit(output.speeds[0].speedMetersPerSecond),
                         output.speeds[0].angle
@@ -144,7 +140,7 @@ object DriveSubsystem : FalconSubsystem() {
                         output.speeds[3].angle
                 )
             }
-            is Output.TrajectoryTrackerOutput -> {
+            is SwerveDriveOutput.TrajectoryTrackerOutput -> {
                 flModule.output = output.flState
                 frModule.output = output.frState
                 brModule.output = output.brState
@@ -158,36 +154,36 @@ object DriveSubsystem : FalconSubsystem() {
     class PeriodicIO {
         var pose = Pose2d()
         var speed = ChassisSpeeds()
-        var output: Output = Output.Nothing
+        var output: SwerveDriveOutput = SwerveDriveOutput.Nothing
     }
+}
 
-    sealed class Output {
-        object Nothing : Output()
+sealed class SwerveDriveOutput {
+    object Nothing : SwerveDriveOutput()
 
-        class Percent(
+    class Percent(
             val chassisSpeed: ChassisSpeeds
-        ) : Output()
+    ) : SwerveDriveOutput()
 
-        class Velocity(
+    class Velocity(
             val chassisSpeed: ChassisSpeeds
-        ) : Output()
+    ) : SwerveDriveOutput()
 
-        class KinematicsVelocity(
+    class KinematicsVelocity(
             val speeds: List<SwerveModuleState>
-        ) : Output()
+    ) : SwerveDriveOutput()
 
-        class TrajectoryTrackerOutput(
+    class TrajectoryTrackerOutput(
             val flState: Mk2SwerveModule.Output.Velocity,
             val frState: Mk2SwerveModule.Output.Velocity,
             val blState: Mk2SwerveModule.Output.Velocity,
             val brState: Mk2SwerveModule.Output.Velocity
-        ) : Output() {
-            constructor() : this (
-                    Mk2SwerveModule.Output.Velocity(),
-                    Mk2SwerveModule.Output.Velocity(),
-                    Mk2SwerveModule.Output.Velocity(),
-                    Mk2SwerveModule.Output.Velocity()
-            )
-        }
+    ) : SwerveDriveOutput() {
+        constructor() : this (
+                Mk2SwerveModule.Output.Velocity(),
+                Mk2SwerveModule.Output.Velocity(),
+                Mk2SwerveModule.Output.Velocity(),
+                Mk2SwerveModule.Output.Velocity()
+        )
     }
 }
