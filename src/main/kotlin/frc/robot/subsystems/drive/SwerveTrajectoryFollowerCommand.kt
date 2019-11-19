@@ -9,20 +9,42 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory
 import frc.robot.subsystems.drive.swerve.Mk2SwerveModule
 import frc.robot.subsystems.drive.swerve.SwerveTrajectoryController
 import lib.PidController
+import lib.mirror
 import org.ghrobotics.lib.commands.FalconCommand
+import org.ghrobotics.lib.mathematics.twodim.trajectory.mirror
 import org.ghrobotics.lib.mathematics.units.SIUnit
+import org.ghrobotics.lib.utils.BooleanSource
 import org.ghrobotics.lib.utils.Source
+import org.ghrobotics.lib.utils.map
+import java.util.function.BooleanSupplier
 
-class SwerveTrajectoryFollowerCommand(val trajectorySupplier: Source<Trajectory>) : FalconCommand(DriveSubsystem) {
+/**
+ * Follow a trajectory
+ * @param trajectorySupplier the trajectory to follow, paired with the end heading of the drivetrain
+ */
+class SwerveTrajectoryFollowerCommand(val trajectorySupplier: Source<Trajectory>,
+                                      val headingSupplier: Source<Rotation2d>) : FalconCommand(DriveSubsystem) {
+
+    constructor(trajectory: Trajectory, targetHeading: Rotation2d, pathMirrored: BooleanSource) : this(
+            pathMirrored.map(trajectory.mirror(), trajectory),
+            pathMirrored.map(targetHeading.mirror(), targetHeading)
+    )
+
+    constructor(trajectory: Trajectory, targetHeading: Rotation2d) : this(
+            { trajectory }, { targetHeading }
+    )
 
     private var prevStates = listOf<SwerveModuleState>()
-    lateinit var trajectory: Trajectory
+    private lateinit var trajectory: Trajectory
+    private lateinit var targetHeading: Rotation2d
     private val timer = Timer()
 
     private val controller = SwerveTrajectoryController(DriveSubsystem.kinematics, DriveSubsystem.feedForward)
 
     override fun initialize() {
         trajectory = trajectorySupplier()
+        targetHeading = headingSupplier()
+
         timer.reset()
         timer.start()
         prevStates = listOf(SwerveModuleState(), SwerveModuleState(), SwerveModuleState(), SwerveModuleState())
@@ -33,7 +55,7 @@ class SwerveTrajectoryFollowerCommand(val trajectorySupplier: Source<Trajectory>
         // update the controller
         val time = timer.get()
         val state = trajectory.sample(time)
-        DriveSubsystem.periodicIO.output = controller.calculate(time, state, DriveSubsystem.periodicIO.pose)
+        DriveSubsystem.periodicIO.output = controller.calculate(time, state, targetHeading, DriveSubsystem.periodicIO.pose)
 
     }
 }

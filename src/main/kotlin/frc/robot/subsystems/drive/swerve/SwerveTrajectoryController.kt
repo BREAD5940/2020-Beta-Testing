@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drive.swerve
 
 import edu.wpi.first.wpilibj.geometry.Pose2d
+import edu.wpi.first.wpilibj.geometry.Rotation2d
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState
@@ -23,7 +24,8 @@ class SwerveTrajectoryController(private val kinematics: SwerveDriveKinematics,
     private val strafeController = PidController(2.0, 0.0)
     private val rotationController = PidController(0.5, 0.0) // rad per sec per radian of error
 
-    fun calculate(time: Double, state: Trajectory.State, currentPose: Pose2d): SwerveDriveOutput.TrajectoryTrackerOutput {
+    fun calculate(time: Double, state: Trajectory.State, targetHeading: Rotation2d,
+                  currentPose: Pose2d): SwerveDriveOutput.TrajectoryTrackerOutput {
 
         // dt
         if(lastTime < 0.0) lastTime = time
@@ -35,7 +37,7 @@ class SwerveTrajectoryController(private val kinematics: SwerveDriveKinematics,
         // P loop to convert delta in X and Y to velocity outputs, and rotation to rotations speed
         forwardController.setSetpoint(state.poseMeters.translation.x)
         strafeController.setSetpoint(state.poseMeters.translation.y)
-        rotationController.setSetpoint(state.poseMeters.rotation.radians)
+        rotationController.setSetpoint(targetHeading.radians)
 
         // place the output in the robot frame of reference
         // and add the trajectory velocity to it as a feedforward
@@ -58,11 +60,11 @@ class SwerveTrajectoryController(private val kinematics: SwerveDriveKinematics,
 
             val ffVoltage = feedforward.getVoltage(SIUnit(moduleVelocity), SIUnit(acceleration))
 
-            outputs[index] = Mk2SwerveModule.Output.Velocity(
+            outputs.add(index, Mk2SwerveModule.Output.Velocity(
                     SIUnit(moduleVelocity),
                     states[index].angle,
                     ffVoltage
-            )
+            ))
         }
 
         prevState = states

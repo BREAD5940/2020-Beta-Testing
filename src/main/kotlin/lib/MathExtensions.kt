@@ -123,3 +123,5 @@ fun Translation2d.isWithinAngle(A: Translation2d, C: Translation2d, vertical: Bo
 fun Translation2d.isWithinAngle(A: Translation2d, C: Translation2d): Boolean {
     return isWithinAngle(A, C, false)
 }
+
+fun Rotation2d.mirror() = Rotation2d(-radians)

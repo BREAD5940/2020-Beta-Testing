@@ -5,15 +5,19 @@ import com.revrobotics.CANSparkMax
 import com.revrobotics.CANSparkMaxLowLevel
 import edu.wpi.first.wpilibj.SPI
 import edu.wpi.first.wpilibj.geometry.Pose2d
+import edu.wpi.first.wpilibj.geometry.Rotation2d
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState
+import edu.wpi.first.wpilibj.trajectory.Trajectory
 import frc.robot.Constants
 import frc.robot.subsystems.drive.swerve.Mk2SwerveModule
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
+import lib.mirror
 import org.ghrobotics.lib.commands.FalconSubsystem
+import org.ghrobotics.lib.mathematics.twodim.trajectory.mirror
 import org.ghrobotics.lib.mathematics.units.Meter
 import org.ghrobotics.lib.mathematics.units.SIUnit
 import org.ghrobotics.lib.mathematics.units.derived.radians
@@ -22,8 +26,9 @@ import org.ghrobotics.lib.mathematics.units.nativeunit.SlopeNativeUnitModel
 import org.ghrobotics.lib.mathematics.units.nativeunit.nativeUnits
 import org.ghrobotics.lib.motors.rev.FalconMAX
 import org.ghrobotics.lib.physics.MotorCharacterization
-import org.ghrobotics.lib.utils.asSource
-import org.ghrobotics.lib.utils.launchFrequency
+import org.ghrobotics.lib.subsystems.drive.CharacterizationCommand
+import org.ghrobotics.lib.subsystems.drive.TrajectoryTrackerCommand
+import org.ghrobotics.lib.utils.*
 
 object DriveSubsystem : FalconSubsystem() {
 
@@ -33,11 +38,11 @@ object DriveSubsystem : FalconSubsystem() {
             1.inches,
             (1.0 / (4.0 * Math.PI / 60.0 * 15.0 / 20.0 * 24.0 / 38.0 * 18.0)).nativeUnits)
 
-    private val flModule = Mk2SwerveModule(0, 0, 0.radians, FalconMAX(
+    val flModule = Mk2SwerveModule(0, 0, 0.radians, FalconMAX(
             CANSparkMax(10, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0001)
 
-    private val frModule = Mk2SwerveModule(1, 1, 0.radians, FalconMAX(
+    val frModule = Mk2SwerveModule(1, 1, 0.radians, FalconMAX(
             CANSparkMax(11, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0001)
 
@@ -59,12 +64,7 @@ object DriveSubsystem : FalconSubsystem() {
         TODO("idk -- need to tune dis. Should be per module!")
     }
 
-    val kinematics = SwerveDriveKinematics(
-            Constants.kModulePositions[0],
-            Constants.kModulePositions[1],
-            Constants.kModulePositions[2],
-            Constants.kModulePositions[3]
-    )
+    val kinematics = Constants.kinematics
 
     internal val odometry = SwerveDriveOdometry(kinematics, Pose2d())
 
@@ -85,7 +85,20 @@ object DriveSubsystem : FalconSubsystem() {
         if (!kinematicsUpdateJob.isActive) kinematicsUpdateJob.start()
     }
 
-    lateinit var kinematicsUpdateJob: Job
+    fun followTrajectory(trajectory: Trajectory, endHeading: Rotation2d, mirrored: Boolean = false) =
+            SwerveTrajectoryFollowerCommand(if(mirrored) trajectory.mirror() else trajectory,
+                    if(mirrored) endHeading.mirror() else endHeading)
+
+    fun followTrajectory(trajectory: Trajectory, endHeading: Rotation2d, mirrored: BooleanSource) =
+            SwerveTrajectoryFollowerCommand(trajectory, endHeading, mirrored)
+
+    fun characterize() = SwerveCharacterizationCommand()
+
+    override fun setNeutral() {
+        periodicIO.output = SwerveDriveOutput.Nothing
+    }
+
+    var kinematicsUpdateJob: Job
     private fun updateState() {
         modules.forEach { it.updateState() }
 
