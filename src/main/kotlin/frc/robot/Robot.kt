@@ -30,6 +30,7 @@ object Robot : FalconTimedRobot() {
     }
 
     override fun robotPeriodic() {
+        Controls.update()
     }
 
     override fun disabledInit() {

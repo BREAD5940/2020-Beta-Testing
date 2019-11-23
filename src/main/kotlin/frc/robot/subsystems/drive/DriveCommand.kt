@@ -6,9 +6,6 @@ import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.utils.withDeadband
 import org.ghrobotics.lib.wrappers.hid.getX
 import org.ghrobotics.lib.wrappers.hid.getY
-import kotlin.math.absoluteValue
-import kotlin.math.max
-import kotlin.math.withSign
 
 class DriveCommand : FalconCommand(DriveSubsystem) {
     override fun isFinished() = false
