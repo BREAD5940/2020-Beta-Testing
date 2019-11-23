@@ -22,7 +22,7 @@ import org.ghrobotics.lib.subsystems.drive.FalconWestCoastDrivetrain
 import org.ghrobotics.lib.utils.Source
 
 object DriveSubsystem : FalconWestCoastDrivetrain() {
-    override val controller: RamseteController(2.0,0.7)
+    override val controller = RamseteController(2.0,0.7)
     val gyro_ = AHRS(SPI.Port.kMXP)
     override val gyro = { (gyro_.yaw * -1).degrees.toRotation2d() }
     override val kinematics: DifferentialDriveKinematics = DifferentialDriveKinematics((26.0).inches.inMeters())
