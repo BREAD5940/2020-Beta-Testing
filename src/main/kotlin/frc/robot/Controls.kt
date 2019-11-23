@@ -14,7 +14,7 @@ object Controls {
     val driverFalconXbox = driverControllerLowLevel.mapControls {
 
         button(kX).changeOn(InstantCommand(Runnable { "Hullo!" }))
-        button(kB).change(DriveSubsystem.followTrajectory(TestTrajectory.trajectory))
+        button(kB).changeOn(DriveSubsystem.followTrajectory(TestTrajectory.trajectory))
     }
 
     val operatorWPIJoystick = XboxController(1)

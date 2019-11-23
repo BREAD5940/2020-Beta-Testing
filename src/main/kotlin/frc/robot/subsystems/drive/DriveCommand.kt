@@ -12,22 +12,12 @@ import kotlin.math.withSign
 
 class DriveCommand : FalconCommand(DriveSubsystem) {
     override fun isFinished() = false
-
     override fun execute() {
         // negative because xbox is negative Y when pushed forward
         val forward = speedSource() // same as -1 * speedSource.invoke()
         val turn = rotationSource()
-
-        val wantedLeftOutput: Double // these will change once we add turning
-        var wantedRightOutput: Double
-
-        val maximum = max(forward.absoluteValue, turn.absoluteValue).withSign(forward)
-
-        wantedLeftOutput = forward - turn
-        wantedRightOutput = forward + turn
-        DriveSubsystem.leftMotor.setDutyCycle((-1 *wantedLeftOutput))
-        DriveSubsystem.rightMotor.setDutyCycle((-1*wantedRightOutput))
-
+        val isQuickTurn = false
+        DriveSubsystem.curvatureDrive(forward, turn, isQuickTurn)
     }
 
     override fun end(interrupted: Boolean) {
