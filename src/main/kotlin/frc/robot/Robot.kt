@@ -4,10 +4,8 @@ package frc.robot
 import edu.wpi.first.wpilibj.Compressor
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import edu.wpi.first.wpilibj2.command.CommandScheduler
-import frc.robot.autonomous.TestTrajectory
+import frc.robot.subsystems.drive.TestTrajectory
 import frc.robot.subsystems.drive.DriveSubsystem
-import org.ghrobotics.lib.subsystems.drive.CharacterizationCommand
-import org.ghrobotics.lib.wrappers.FalconSolenoid
 import org.ghrobotics.lib.wrappers.FalconTimedRobot
 
 object Robot : FalconTimedRobot() {
@@ -26,8 +24,6 @@ object Robot : FalconTimedRobot() {
     }
 
     override fun autonomousInit() {
-        Compressor(9).closedLoopControl = true
-        DriveSubsystem.followTrajectory(TestTrajectory.trajectory)
     }
 
     override fun teleopPeriodic() {
