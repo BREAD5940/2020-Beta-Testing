@@ -30,7 +30,7 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
     override fun execute() {
         val forward = -xSource()
         val strafe = -zSource()
-        val rotation = -rotSource() * 3.0
+        val rotation = -rotSource() * 6.0
 
         println("commanding forward $forward strafe $strafe rotation $rotation")
 
