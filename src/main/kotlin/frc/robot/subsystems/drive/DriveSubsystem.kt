@@ -2,23 +2,13 @@ package frc.robot.subsystems.drive
 
 import com.revrobotics.CANSparkMaxLowLevel
 import edu.wpi.first.wpilibj.GenericHID
-import edu.wpi.first.wpilibj.controller.RamseteController
-import edu.wpi.first.wpilibj.geometry.Rotation2d
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry
-import edu.wpi.first.wpilibj2.command.SubsystemBase
 import frc.robot.Controls
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.commands.FalconSubsystem
-import org.ghrobotics.lib.mathematics.units.Meter
 import org.ghrobotics.lib.mathematics.units.nativeunit.DefaultNativeUnitModel
-import org.ghrobotics.lib.motors.FalconMotor
 import org.ghrobotics.lib.motors.rev.falconMAX
-import org.ghrobotics.lib.physics.MotorCharacterization
 import org.ghrobotics.lib.subsystems.drive.FalconDriveHelper
-import org.ghrobotics.lib.subsystems.drive.FalconWestCoastDrivetrain
-import org.ghrobotics.lib.utils.Source
-import javax.naming.ldap.Control
+import edu.wpi.first.wpilibj2.command.SubsystemBase
 
 object DriveSubsystem : FalconSubsystem() {
 

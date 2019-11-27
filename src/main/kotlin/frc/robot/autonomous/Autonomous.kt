@@ -1,12 +1,11 @@
-package frc.robot.auto
+package frc.robot.autonomous
 
 import edu.wpi.first.wpilibj.geometry.Pose2d
+import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.CommandBase
 import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.robot.Network
 import frc.robot.Robot
-import frc.robot.subsystems.drive.DriveSubsystem
-import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
 import org.ghrobotics.lib.utils.Source
 import org.ghrobotics.lib.utils.and
 import org.ghrobotics.lib.utils.monitor
