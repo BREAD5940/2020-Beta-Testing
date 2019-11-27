@@ -9,7 +9,11 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory
 import frc.robot.subsystems.drive.swerve.Mk2SwerveModule
 import lib.PidController
 import org.ghrobotics.lib.commands.FalconCommand
+import org.ghrobotics.lib.debug.LiveDashboard
+import org.ghrobotics.lib.mathematics.twodim.geometry.x_u
+import org.ghrobotics.lib.mathematics.twodim.geometry.y_u
 import org.ghrobotics.lib.mathematics.units.SIUnit
+import org.ghrobotics.lib.mathematics.units.inFeet
 import org.ghrobotics.lib.utils.Source
 
 class SwerveTrajectoryFollowerCommand(val trajectorySupplier: Source<Trajectory>) : FalconCommand(DriveSubsystem) {
@@ -29,7 +33,13 @@ class SwerveTrajectoryFollowerCommand(val trajectorySupplier: Source<Trajectory>
         timer.reset()
         timer.start()
         prevTime = 0.0
+        LiveDashboard.isFollowingPath = false
+        LiveDashboard.isFollowingPath = true
         prevStates = listOf(SwerveModuleState(), SwerveModuleState(), SwerveModuleState(), SwerveModuleState())
+    }
+
+    override fun end(interrupted: Boolean) {
+        LiveDashboard.isFollowingPath = true
     }
 
     override fun execute() {
@@ -78,6 +88,11 @@ class SwerveTrajectoryFollowerCommand(val trajectorySupplier: Source<Trajectory>
         DriveSubsystem.periodicIO.output = DriveSubsystem.Output.TrajectoryTrackerOutput(
                 outputs[0], outputs[1], outputs[2], outputs[3]
         )
+
+        // output to smartdashboard
+        LiveDashboard.pathX = state.poseMeters.translation.x_u.inFeet()
+        LiveDashboard.pathY = state.poseMeters.translation.y_u.inFeet()
+        LiveDashboard.pathHeading = state.poseMeters.rotation.radians
 
         prevTime = time
         prevStates = states

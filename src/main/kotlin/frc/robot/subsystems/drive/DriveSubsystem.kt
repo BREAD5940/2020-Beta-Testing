@@ -19,12 +19,12 @@ import frc.robot.subsystems.drive.swerve.Mk2SwerveModule
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import org.ghrobotics.lib.commands.FalconSubsystem
-import org.ghrobotics.lib.mathematics.units.Meter
-import org.ghrobotics.lib.mathematics.units.SIUnit
+import org.ghrobotics.lib.debug.LiveDashboard
+import org.ghrobotics.lib.mathematics.twodim.geometry.x_u
+import org.ghrobotics.lib.mathematics.twodim.geometry.y_u
+import org.ghrobotics.lib.mathematics.units.*
 import org.ghrobotics.lib.mathematics.units.derived.radians
 import org.ghrobotics.lib.mathematics.units.derived.toRotation2d
-import org.ghrobotics.lib.mathematics.units.inMeters
-import org.ghrobotics.lib.mathematics.units.inches
 import org.ghrobotics.lib.mathematics.units.nativeunit.SlopeNativeUnitModel
 import org.ghrobotics.lib.mathematics.units.nativeunit.nativeUnits
 import org.ghrobotics.lib.motors.rev.FalconMAX
@@ -75,6 +75,8 @@ object DriveSubsystem : FalconSubsystem() {
             Constants.kModulePositions[3]
     )
 
+    val robotPosition get() = periodicIO.pose
+
     internal val odometry = SwerveDriveOdometry(kinematics, Rotation2d())
 
     private val stateLock = Object()
@@ -94,6 +96,11 @@ object DriveSubsystem : FalconSubsystem() {
 
     override fun periodic() {
         if (!kinematicsUpdateJob.isActive) kinematicsUpdateJob.start()
+
+        LiveDashboard.robotHeading = robotPosition.rotation.radians
+        LiveDashboard.robotX = robotPosition.translation.x_u.inFeet()
+        LiveDashboard.robotY = robotPosition.translation.y_u.inFeet()
+
     }
 
     private var kinematicsUpdateJob: Job
