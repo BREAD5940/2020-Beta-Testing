@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory
 import frc.robot.subsystems.drive.swerve.Mk2SwerveModule
 import lib.PidController
 import org.ghrobotics.lib.commands.FalconCommand
+import org.ghrobotics.lib.debug.FalconDashboard
 import org.ghrobotics.lib.debug.LiveDashboard
 import org.ghrobotics.lib.mathematics.twodim.geometry.x_u
 import org.ghrobotics.lib.mathematics.twodim.geometry.y_u
@@ -33,13 +34,13 @@ class SwerveTrajectoryFollowerCommand(val trajectorySupplier: Source<Trajectory>
         timer.reset()
         timer.start()
         prevTime = 0.0
-        LiveDashboard.isFollowingPath = false
-        LiveDashboard.isFollowingPath = true
+        FalconDashboard.isFollowingPath = false
+        FalconDashboard.isFollowingPath = true
         prevStates = listOf(SwerveModuleState(), SwerveModuleState(), SwerveModuleState(), SwerveModuleState())
     }
 
     override fun end(interrupted: Boolean) {
-        LiveDashboard.isFollowingPath = true
+        FalconDashboard.isFollowingPath = true
     }
 
     override fun execute() {
@@ -90,9 +91,9 @@ class SwerveTrajectoryFollowerCommand(val trajectorySupplier: Source<Trajectory>
         )
 
         // output to smartdashboard
-        LiveDashboard.pathX = state.poseMeters.translation.x_u.inFeet()
-        LiveDashboard.pathY = state.poseMeters.translation.y_u.inFeet()
-        LiveDashboard.pathHeading = state.poseMeters.rotation.radians
+        FalconDashboard.pathX = state.poseMeters.translation.x_u.inFeet()
+        FalconDashboard.pathY = state.poseMeters.translation.y_u.inFeet()
+        FalconDashboard.pathHeading = state.poseMeters.rotation.radians
 
         prevTime = time
         prevStates = states

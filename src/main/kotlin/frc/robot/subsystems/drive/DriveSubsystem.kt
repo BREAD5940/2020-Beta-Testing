@@ -19,18 +19,16 @@ import frc.robot.subsystems.drive.swerve.Mk2SwerveModule
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import org.ghrobotics.lib.commands.FalconSubsystem
-import org.ghrobotics.lib.debug.LiveDashboard
+import org.ghrobotics.lib.debug.FalconDashboard
 import org.ghrobotics.lib.mathematics.twodim.geometry.x_u
 import org.ghrobotics.lib.mathematics.twodim.geometry.y_u
 import org.ghrobotics.lib.mathematics.units.*
+import org.ghrobotics.lib.mathematics.units.derived.degrees
 import org.ghrobotics.lib.mathematics.units.derived.radians
 import org.ghrobotics.lib.mathematics.units.derived.toRotation2d
 import org.ghrobotics.lib.mathematics.units.nativeunit.SlopeNativeUnitModel
 import org.ghrobotics.lib.mathematics.units.nativeunit.nativeUnits
-import org.ghrobotics.lib.motors.rev.FalconMAX
 import org.ghrobotics.lib.physics.MotorCharacterization
-import org.ghrobotics.lib.utils.BooleanSource
-import org.ghrobotics.lib.utils.asSource
 import org.ghrobotics.lib.utils.launchFrequency
 
 object DriveSubsystem : FalconSubsystem() {
@@ -61,11 +59,11 @@ object DriveSubsystem : FalconSubsystem() {
     val modules = listOf(flModule, frModule, blModule, brModule)
 
     val feedForward = MotorCharacterization<Meter>(
-            SIUnit(0.8),
-            SIUnit(0.1),
-            SIUnit(0.5)
+            SIUnit(2.6),
+            SIUnit(0.0),
+            SIUnit(0.0)
     ).apply {
-        TODO("idk -- need to tune dis. Should be per module!")
+//        TODO("idk -- need to tune dis. Should be per module!")
     }
 
     val kinematics = SwerveDriveKinematics(
@@ -92,18 +90,21 @@ object DriveSubsystem : FalconSubsystem() {
         }
 
         lastUpdateTime = Timer.getFPGATimestamp()
+        odometry.resetPosition(Pose2d(4.0, 4.0, 0.degrees.toRotation2d()), robotPosition.rotation)
+
+        defaultCommand = HolomonicDriveCommand()
     }
 
     override fun periodic() {
         if (!kinematicsUpdateJob.isActive) kinematicsUpdateJob.start()
 
-        LiveDashboard.robotHeading = robotPosition.rotation.radians
-        LiveDashboard.robotX = robotPosition.translation.x_u.inFeet()
-        LiveDashboard.robotY = robotPosition.translation.y_u.inFeet()
+        FalconDashboard.robotHeading = robotPosition.rotation.radians
+        FalconDashboard.robotX = robotPosition.translation.x_u.inFeet()
+        FalconDashboard.robotY = robotPosition.translation.y_u.inFeet()
 
     }
 
-    private var kinematicsUpdateJob: Job
+    private lateinit var kinematicsUpdateJob: Job
     private var lastUpdateTime = 0.0
     private fun updateState() {
         modules.forEach { it.updateState() }

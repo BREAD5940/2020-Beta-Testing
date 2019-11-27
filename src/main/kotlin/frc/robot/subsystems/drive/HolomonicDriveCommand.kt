@@ -9,6 +9,9 @@ import frc.robot.Constants
 import frc.robot.Controls
 import lib.*
 import org.ghrobotics.lib.commands.FalconCommand
+import org.ghrobotics.lib.mathematics.units.inFeet
+import org.ghrobotics.lib.mathematics.units.meters
+import org.ghrobotics.lib.utils.withDeadband
 import org.ghrobotics.lib.wrappers.hid.getX
 import org.ghrobotics.lib.wrappers.hid.getY
 import kotlin.math.absoluteValue
@@ -20,16 +23,24 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
     private var clockwiseCenter = Translation2d()
     private var counterClockwiseCenter = Translation2d()
 
-    override fun execute() {
-        val forward = xSource()
-        val strafe = zSource()
-        val rotation = rotSource()
+    override fun runsWhenDisabled(): Boolean {
+        return true
+    }
 
+    override fun execute() {
+        val forward = -xSource()
+        val strafe = -zSource()
+        val rotation = -rotSource() * 3.0
+
+        println("commanding forward $forward strafe $strafe rotation $rotation")
 
         // calculate translation vector (with magnitude of the max speed
         // volts divided by volts per meter per second is meters per second
+        println("Scaler ${(12.0 / DriveSubsystem.feedForward.kV.value)}")
         var translation = Translation2d(forward, strafe) * (12.0 / DriveSubsystem.feedForward.kV.value) // this will have a norm of 1
         val magnitude = translation.norm
+
+        println("chassis velocity: ${magnitude.meters.inFeet()}")
 
         // snap translation power to poles if we're close to them
         if ((translation.toRotation2d().distance(translation.toRotation2d().nearestPole())).radians.absoluteValue
@@ -64,7 +75,7 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
         // Normalize wheel speeds
         // volts per meter per second times meters per seconds gives volts
         SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates,
-                DriveSubsystem.feedForward.kV.value * 12.0)
+                12.0 / DriveSubsystem.feedForward.kV.value)
 
         DriveSubsystem.periodicIO.output = DriveSubsystem.Output.KinematicsVelocity(moduleStates.toList())
     }
@@ -86,9 +97,9 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
     }
 
     companion object {
-        val xSource by lazy { Controls.driverFalconXbox.getY(GenericHID.Hand.kLeft) }
-        val zSource by lazy { Controls.driverFalconXbox.getX(GenericHID.Hand.kLeft) }
-        val rotSource by lazy { Controls.driverFalconXbox.getX(GenericHID.Hand.kRight) }
+        val xSource by lazy { Controls.driverFalconXbox.getY(GenericHID.Hand.kLeft).withDeadband(0.02) }
+        val zSource by lazy { Controls.driverFalconXbox.getX(GenericHID.Hand.kLeft).withDeadband(0.02) }
+        val rotSource by lazy { Controls.driverFalconXbox.getX(GenericHID.Hand.kRight).withDeadband(0.06) }
 
         val evadingButton by lazy { Controls.driverFalconXbox.getRawButton(11) } // TODO check
 

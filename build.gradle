@@ -41,7 +41,7 @@ deploy {
         frcJavaArtifact('frcJava') {
             targets << "roborio"
             // Debug can be overridden by command line, for use with VSCode
-            debug = frc.getDebugOrDefault(false)
+            debug = frc.getDebugOrDefault(true)
         }
         // Built in artifact to deploy arbitrary files to the roboRIO.
         fileTreeArtifact('frcStaticFileDeploy') {
@@ -55,7 +55,7 @@ deploy {
 }
 
 // Set this to true to enable desktop support.
-def includeDesktopSupport = false
+def includeDesktopSupport = true
 
 // Maven central needed for JUnit
 repositories {
@@ -79,6 +79,19 @@ dependencies {
     compile wpi.deps.vendor.java()
     nativeZip wpi.deps.vendor.jni(wpi.platforms.roborio)
     nativeDesktopZip wpi.deps.vendor.jni(wpi.platforms.desktop)
+
+    // The 2019.2.1 release of halsim_ds_socket is broken on windows, so we built a fixed version ourselves while
+    // we wait for 2019.3.1
+    if (wpi.platforms.desktop == 'windowsx86-64') {
+        simulation rootProject.files('libs/halsim_ds_socketd.dll')
+    } else if (wpi.platforms.desktop == 'osxx86-64') {
+        simulation rootProject.files('libs/libhalsim_ds_socketd.dylib')
+    } else if (wpi.platforms.desktop == 'linuxx86-64') {
+        simulation rootProject.files('libs/libhalsim_ds_socketd.so')
+    } else {
+        simulation "edu.wpi.first.halsim:halsim_ds_socket:${wpi.wpilibVersion}:${wpi.platforms.desktop}debug@zip"
+    }
+    simulation "edu.wpi.first.halsim:halsim_ds_socket:${wpi.wpilibVersion}:${wpi.platforms.desktop}@zip"
 
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.0-RC"
     testCompile "junit:junit:4.12"
