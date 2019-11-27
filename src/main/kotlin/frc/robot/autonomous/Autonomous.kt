@@ -40,7 +40,7 @@ object Autonomous {
     // Update the autonomous listener.
     fun update() {
         // Update localization.
-        startingPositionMonitor.onChange { if (!Robot.isEnabled) DriveSubsystem.odometry.resetPosition(it.pose) }
+        startingPositionMonitor.onChange { if (!Robot.isEnabled) DriveSubsystem.odometry.resetPosition(it.pose, DriveSubsystem.periodicIO.pose.rotation) }
 
         // update our selected auto mode
         selectedAutonomous = possibleAutos[autoMode()] ?: doNothing

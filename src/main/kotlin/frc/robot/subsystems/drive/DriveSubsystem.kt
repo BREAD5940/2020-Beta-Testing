@@ -6,6 +6,7 @@ import com.revrobotics.CANSparkMaxLowLevel
 import edu.wpi.first.wpilibj.SPI
 import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.geometry.Pose2d
+import edu.wpi.first.wpilibj.geometry.Rotation2d
 import edu.wpi.first.wpilibj.geometry.Translation2d
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics
@@ -28,6 +29,7 @@ import org.ghrobotics.lib.mathematics.units.nativeunit.SlopeNativeUnitModel
 import org.ghrobotics.lib.mathematics.units.nativeunit.nativeUnits
 import org.ghrobotics.lib.motors.rev.FalconMAX
 import org.ghrobotics.lib.physics.MotorCharacterization
+import org.ghrobotics.lib.utils.BooleanSource
 import org.ghrobotics.lib.utils.asSource
 import org.ghrobotics.lib.utils.launchFrequency
 
@@ -73,7 +75,7 @@ object DriveSubsystem : FalconSubsystem() {
             Constants.kModulePositions[3]
     )
 
-    internal val odometry = SwerveDriveOdometry(kinematics, Pose2d())
+    internal val odometry = SwerveDriveOdometry(kinematics, Rotation2d())
 
     private val stateLock = Object()
     val periodicIO = PeriodicIO()
