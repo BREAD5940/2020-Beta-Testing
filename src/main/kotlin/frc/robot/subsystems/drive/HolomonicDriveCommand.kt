@@ -9,6 +9,7 @@ import frc.robot.Constants
 import frc.robot.Controls
 import lib.*
 import org.ghrobotics.lib.commands.FalconCommand
+import org.ghrobotics.lib.utils.withDeadband
 import org.ghrobotics.lib.wrappers.hid.getX
 import org.ghrobotics.lib.wrappers.hid.getY
 import kotlin.math.absoluteValue
@@ -21,10 +22,9 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
     private var counterClockwiseCenter = Translation2d()
 
     override fun execute() {
-        val forward = xSource()
-        val strafe = zSource()
-        val rotation = rotSource()
-
+        val forward = -xSource()
+        val strafe = -zSource()
+        val rotation = -rotSource() * 6.0
 
         // calculate translation vector (with magnitude of the max speed
         // volts divided by volts per meter per second is meters per second
@@ -86,9 +86,9 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
     }
 
     companion object {
-        val xSource by lazy { Controls.driverFalconXbox.getY(GenericHID.Hand.kLeft) }
-        val zSource by lazy { Controls.driverFalconXbox.getX(GenericHID.Hand.kLeft) }
-        val rotSource by lazy { Controls.driverFalconXbox.getX(GenericHID.Hand.kRight) }
+        val xSource by lazy { Controls.driverFalconXbox.getY(GenericHID.Hand.kLeft).withDeadband(0.02) }
+        val zSource by lazy { Controls.driverFalconXbox.getX(GenericHID.Hand.kLeft).withDeadband(0.02) }
+        val rotSource by lazy { Controls.driverFalconXbox.getX(GenericHID.Hand.kRight).withDeadband(0.06) }
 
         val evadingButton by lazy { Controls.driverFalconXbox.getRawButton(11) } // TODO check
 

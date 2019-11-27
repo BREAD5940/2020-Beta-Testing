@@ -61,9 +61,9 @@ object DriveSubsystem : FalconSubsystem() {
     val modules = listOf(flModule, frModule, blModule, brModule)
 
     val feedForward = MotorCharacterization<Meter>(
-            SIUnit(0.8),
-            SIUnit(0.1),
-            SIUnit(0.5)
+            SIUnit(2.6),
+            SIUnit(0.0),
+            SIUnit(0.0)
     ).apply {
         TODO("idk -- need to tune dis. Should be per module!")
     }
