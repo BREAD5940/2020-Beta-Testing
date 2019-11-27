@@ -26,9 +26,9 @@ import org.ghrobotics.lib.mathematics.units.nativeunit.SlopeNativeUnitModel
 import org.ghrobotics.lib.mathematics.units.nativeunit.nativeUnits
 import org.ghrobotics.lib.motors.rev.FalconMAX
 import org.ghrobotics.lib.physics.MotorCharacterization
-import org.ghrobotics.lib.subsystems.drive.CharacterizationCommand
-import org.ghrobotics.lib.subsystems.drive.TrajectoryTrackerCommand
-import org.ghrobotics.lib.utils.*
+import org.ghrobotics.lib.utils.BooleanSource
+import org.ghrobotics.lib.utils.asSource
+import org.ghrobotics.lib.utils.launchFrequency
 
 object DriveSubsystem : FalconSubsystem() {
 
@@ -66,7 +66,7 @@ object DriveSubsystem : FalconSubsystem() {
 
     val kinematics = Constants.kinematics
 
-    internal val odometry = SwerveDriveOdometry(kinematics, Pose2d())
+    internal val odometry = SwerveDriveOdometry(kinematics, gyro())
 
     private val stateLock = Object()
     val periodicIO = PeriodicIO()
