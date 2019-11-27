@@ -11,8 +11,12 @@ import frc.robot.subsystems.drive.swerve.SwerveTrajectoryController
 import lib.PidController
 import lib.mirror
 import org.ghrobotics.lib.commands.FalconCommand
+import org.ghrobotics.lib.debug.FalconDashboard
+import org.ghrobotics.lib.mathematics.twodim.geometry.x_u
+import org.ghrobotics.lib.mathematics.twodim.geometry.y_u
 import org.ghrobotics.lib.mathematics.twodim.trajectory.mirror
 import org.ghrobotics.lib.mathematics.units.SIUnit
+import org.ghrobotics.lib.mathematics.units.inFeet
 import org.ghrobotics.lib.utils.BooleanSource
 import org.ghrobotics.lib.utils.Source
 import org.ghrobotics.lib.utils.map
@@ -41,9 +45,17 @@ class SwerveTrajectoryFollowerCommand(val trajectorySupplier: Source<Trajectory>
 
     private val controller = SwerveTrajectoryController(DriveSubsystem.kinematics, DriveSubsystem.feedForward)
 
+    override fun isFinished() = timer.hasPeriodPassed(trajectory.totalTimeSeconds)
+
+    override fun end(interrupted: Boolean) {
+        FalconDashboard.isFollowingPath = false
+    }
+
     override fun initialize() {
         trajectory = trajectorySupplier()
         targetHeading = headingSupplier()
+
+        FalconDashboard.isFollowingPath = true
 
         timer.reset()
         timer.start()
@@ -57,6 +69,9 @@ class SwerveTrajectoryFollowerCommand(val trajectorySupplier: Source<Trajectory>
         val state = trajectory.sample(time)
         DriveSubsystem.periodicIO.output = controller.calculate(time, state, targetHeading, DriveSubsystem.periodicIO.pose)
 
+        FalconDashboard.pathX = state.poseMeters.translation.x_u.inFeet()
+        FalconDashboard.pathY = state.poseMeters.translation.y_u.inFeet()
+        FalconDashboard.pathHeading = state.poseMeters.rotation.radians
     }
 }
 

@@ -17,10 +17,14 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import lib.mirror
 import org.ghrobotics.lib.commands.FalconSubsystem
+import org.ghrobotics.lib.debug.FalconDashboard
+import org.ghrobotics.lib.mathematics.twodim.geometry.x_u
+import org.ghrobotics.lib.mathematics.twodim.geometry.y_u
 import org.ghrobotics.lib.mathematics.twodim.trajectory.mirror
 import org.ghrobotics.lib.mathematics.units.Meter
 import org.ghrobotics.lib.mathematics.units.SIUnit
 import org.ghrobotics.lib.mathematics.units.derived.radians
+import org.ghrobotics.lib.mathematics.units.inFeet
 import org.ghrobotics.lib.mathematics.units.inches
 import org.ghrobotics.lib.mathematics.units.nativeunit.SlopeNativeUnitModel
 import org.ghrobotics.lib.mathematics.units.nativeunit.nativeUnits
@@ -81,8 +85,14 @@ object DriveSubsystem : FalconSubsystem() {
         }
     }
 
+    val robotPosition get() = periodicIO.pose
+    
     override fun periodic() {
         if (!kinematicsUpdateJob.isActive) kinematicsUpdateJob.start()
+
+        FalconDashboard.robotHeading = robotPosition.rotation.radians
+        FalconDashboard.robotX = robotPosition.translation.x_u.inFeet()
+        FalconDashboard.robotY = robotPosition.translation.y_u.inFeet()
     }
 
     fun followTrajectory(trajectory: Trajectory, endHeading: Rotation2d, mirrored: Boolean = false) =
