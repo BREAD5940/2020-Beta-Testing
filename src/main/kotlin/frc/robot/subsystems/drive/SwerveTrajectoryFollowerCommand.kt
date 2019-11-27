@@ -39,8 +39,12 @@ class SwerveTrajectoryFollowerCommand(val trajectorySupplier: Source<Trajectory>
         prevStates = listOf(SwerveModuleState(), SwerveModuleState(), SwerveModuleState(), SwerveModuleState())
     }
 
+    override fun isFinished(): Boolean {
+        return timer.hasPeriodPassed(trajectory.totalTimeSeconds)
+    }
+
     override fun end(interrupted: Boolean) {
-        FalconDashboard.isFollowingPath = true
+        FalconDashboard.isFollowingPath = false
     }
 
     override fun execute() {
@@ -79,11 +83,11 @@ class SwerveTrajectoryFollowerCommand(val trajectorySupplier: Source<Trajectory>
 
             val ffVoltage = ff.getVoltage(SIUnit(moduleVelocity), SIUnit(acceleration))
 
-            outputs[index] = Mk2SwerveModule.Output.Velocity(
+            outputs.add(index,Mk2SwerveModule.Output.Velocity(
                     SIUnit(moduleVelocity),
                     states[index].angle,
                     ffVoltage
-            )
+            ))
         }
 
         DriveSubsystem.periodicIO.output = DriveSubsystem.Output.TrajectoryTrackerOutput(

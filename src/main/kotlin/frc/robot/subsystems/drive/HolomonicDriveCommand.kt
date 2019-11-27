@@ -101,7 +101,7 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
         val zSource by lazy { Controls.driverFalconXbox.getX(GenericHID.Hand.kLeft).withDeadband(0.02) }
         val rotSource by lazy { Controls.driverFalconXbox.getX(GenericHID.Hand.kRight).withDeadband(0.06) }
 
-        val evadingButton by lazy { Controls.driverFalconXbox.getRawButton(11) } // TODO check
+        val evadingButton by lazy { Controls.driverFalconXbox.getRawButton(10) } // TODO check
 
         var centerOfRotation = Translation2d()
     }
