@@ -89,7 +89,6 @@ class Mk2SwerveModule(
         // is less than 90 deg by inverting the wheel direction
         val delta = targetAngle - currentAngle
         if (delta.degrees > 90.0 || delta.degrees < -90.0) {
-            targetAngle += 180.degrees.toRotation2d()
             output.reverse()
         }
         return output
