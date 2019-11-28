@@ -4,21 +4,26 @@ import com.revrobotics.CANSparkMaxLowLevel
 import edu.wpi.first.wpilibj.AnalogInput
 import edu.wpi.first.wpilibj.RobotController
 import edu.wpi.first.wpilibj.Spark
+import edu.wpi.first.wpilibj.controller.PIDController
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController
 import edu.wpi.first.wpilibj.geometry.Rotation2d
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile
 import kotlin.math.PI
 import lib.PidController
 import org.ghrobotics.lib.mathematics.units.* // ktlint-disable no-wildcard-imports
 import org.ghrobotics.lib.mathematics.units.derived.* // ktlint-disable no-wildcard-imports
 import org.ghrobotics.lib.motors.rev.FalconMAX
 
-class Mk2SwerveModule(
-    azimuthPAMPort: Int,
-    azimuthAnalogPort: Int,
-    private val offset: SIUnit<Radian>,
-    val driveMotor: FalconMAX<Meter>,
-    angleKp: Double,
-    angleKd: Double
+open class Mk2SwerveModule(
+        azimuthPAMPort: Int,
+        azimuthAnalogPort: Int,
+        private val offset: SIUnit<Radian>,
+        val driveMotor: FalconMAX<Meter>,
+        angleKp: Double,
+        angleKi: Double,
+        angleKd: Double,
+        private val angleMotorOutputRange: ClosedFloatingPointRange<Double>
 ) {
 
     private val stateMutex = Object()
@@ -31,11 +36,13 @@ class Mk2SwerveModule(
         set(value) { periodicIO.desiredOutput = value }
 
     private val azimuthMotor = Spark(azimuthPAMPort)
-    private val azimuthController = PidController(angleKp, angleKd).apply {
-        setInputRange(0.0, 2.0 * PI)
-        setContinuous(true)
-        setOutputRange(-0.5, 0.5)
-    }
+    private val azimuthController =
+            PIDController(angleKp, angleKi, angleKd).apply {
+                //                setInputRange(0.0, 2.0 * PI)
+//                setContinuous(true)
+//                setOutputRange(-0.5, 0.5)
+                enableContinuousInput(-PI, PI)
+            }
 
     private val analogInput = AnalogInput(azimuthAnalogPort)
     val azimuthAngle =
@@ -50,7 +57,7 @@ class Mk2SwerveModule(
     }
 
     fun updateState() {
-        periodicIO.distance = driveMotor.encoder.position
+//        periodicIO.distance = driveMotor.encoder.position
         periodicIO.state = SwerveModuleState(
                 driveMotor.encoder.velocity.value,
                 azimuthAngle())
@@ -59,8 +66,10 @@ class Mk2SwerveModule(
     fun useState() {
 
         val customizedOutput = customizeAngle(periodicIO.desiredOutput)
-        azimuthController.setSetpoint(customizedOutput.angle.radians)
-        azimuthMotor.set(azimuthController.calculate(periodicIO.state.angle.radians, 0.020))
+//        azimuthController.setSetpoint(customizedOutput.angle.radians)
+        val angleOutput = azimuthController.calculate(
+                periodicIO.state.angle.radians, customizedOutput.angle.radians)
+        azimuthMotor.set(angleOutput.coerceIn(angleMotorOutputRange))
 
         // check if we should reverse the angle
         when (customizedOutput) {
@@ -81,7 +90,7 @@ class Mk2SwerveModule(
      * if so, reverse it
      */
     private fun customizeAngle(output: Output): Output {
-        var targetAngle = output.angle
+        val targetAngle = output.angle
         val currentAngle = periodicIO.state.angle
 
         // Deltas that are greater than 90 deg or less than -90 deg can be
@@ -95,8 +104,15 @@ class Mk2SwerveModule(
     }
 
     protected class PeriodicIO {
-        var distance = 0.meters
+        /**
+         * The current state of this module, updating by the [updateState] method.
+         */
         var state = SwerveModuleState()
+
+        /**
+         * The desired output of this module, which will be sent to the motors
+         * in the [useState] method.
+         */
         var desiredOutput: Output = Output.Nothing
     }
 
@@ -109,8 +125,8 @@ class Mk2SwerveModule(
         }
 
         class Percent(
-            val percent: Double,
-            angle: Rotation2d
+                val percent: Double,
+                angle: Rotation2d
         ) : Output(angle) {
             override fun reverse(): Output {
                 return Percent(-percent, angle + 180.degrees.toRotation2d())
@@ -118,9 +134,9 @@ class Mk2SwerveModule(
         }
 
         class Velocity(
-            val velocity: SIUnit<LinearVelocity>,
-            angle: Rotation2d,
-            val arbitraryFeedForward: SIUnit<Volt> = 0.volts
+                val velocity: SIUnit<LinearVelocity>,
+                angle: Rotation2d,
+                val arbitraryFeedForward: SIUnit<Volt> = 0.volts
         ) : Output(angle) {
             constructor() : this(0.meters.velocity, 0.degrees.toRotation2d(), 0.volts)
 

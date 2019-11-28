@@ -1,30 +1,26 @@
 package swerve
 
-import com.ctre.phoenix.CANifier
 import edu.wpi.first.wpilibj.geometry.Rotation2d
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState
 import edu.wpi.first.wpilibj.trajectory.Trajectory
-import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator
 import frc.robot.Constants
 import frc.robot.subsystems.drive.swerve.Mk2SwerveModule
 import frc.robot.subsystems.drive.swerve.SwerveTrajectoryController
-import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
-import org.ghrobotics.lib.mathematics.twodim.trajectory.FalconTrajectoryConfig
-import org.ghrobotics.lib.mathematics.units.SIUnit
-import org.ghrobotics.lib.mathematics.units.derived.*
-import org.ghrobotics.lib.mathematics.units.feet
-import org.ghrobotics.lib.mathematics.units.kFeetToMeter
-import org.ghrobotics.lib.physics.MotorCharacterization
-import org.ghrobotics.lib.utils.setLEDOutput
-import org.junit.Test
-import org.knowm.xchart.SwingWrapper
-import org.knowm.xchart.XYChartBuilder
 import java.awt.Color
 import java.awt.Font
 import java.text.DecimalFormat
 import kotlin.math.absoluteValue
+import org.ghrobotics.lib.mathematics.twodim.geometry.Pose2d
+import org.ghrobotics.lib.mathematics.twodim.trajectory.FalconTrajectoryConfig
+import org.ghrobotics.lib.mathematics.units.SIUnit
+import org.ghrobotics.lib.mathematics.units.derived.* // ktlint-disable no-wildcard-imports
+import org.ghrobotics.lib.mathematics.units.feet
+import org.ghrobotics.lib.mathematics.units.kFeetToMeter
+import org.ghrobotics.lib.physics.MotorCharacterization
+import org.junit.Test
+import org.knowm.xchart.XYChartBuilder
 
 class SwerveTrajectoryFollowerTest {
 
@@ -37,8 +33,8 @@ class SwerveTrajectoryFollowerTest {
 
         // setting up kinematics
         val kinematics = Constants.kinematics
-        val odometry = SwerveDriveOdometry(kinematics)
-        odometry.resetPosition(Pose2d(4.feet, 10.feet, 45.degrees))
+        val odometry = SwerveDriveOdometry(kinematics, 45.degrees.toRotation2d())
+        odometry.resetPosition(Pose2d(4.feet, 10.feet, 45.degrees), 45.degrees.toRotation2d())
         val controller = SwerveTrajectoryController(kinematics,
                 MotorCharacterization(
                         SIUnit(2.25),
@@ -48,7 +44,7 @@ class SwerveTrajectoryFollowerTest {
         // Sample the trajectory
         val samples = mutableListOf<Trajectory.State>()
         var i = 0.0
-        while(i < trajectory.totalTimeSeconds) {
+        while (i < trajectory.totalTimeSeconds) {
             samples += trajectory.sample(i)
             i += 0.020
         }
@@ -61,7 +57,7 @@ class SwerveTrajectoryFollowerTest {
         val targetHeading = Rotation2d()
 
         var time = 0.0
-        for(state in samples) {
+        for (state in samples) {
 
             // Add references
             refxList += state.poseMeters.translation.x / kFeetToMeter
@@ -130,9 +126,7 @@ class SwerveTrajectoryFollowerTest {
         assert((refyList.last() - yList.last()).absoluteValue < 0.5)
         val headingError = (targetHeading.degrees - odometry.poseMeters.rotation.degrees).absoluteValue
         assert(headingError < 10.0)
-
     }
-
 }
 
 private fun Mk2SwerveModule.Output.Velocity.toSwerveModuleState() =

@@ -13,8 +13,10 @@ import org.ghrobotics.lib.mathematics.units.Meter
 import org.ghrobotics.lib.mathematics.units.SIUnit
 import org.ghrobotics.lib.physics.MotorCharacterization
 
-class SwerveTrajectoryController(private val kinematics: SwerveDriveKinematics,
-                                 private val feedforward: MotorCharacterization<Meter>) {
+class SwerveTrajectoryController(
+    private val kinematics: SwerveDriveKinematics,
+    private val feedforward: MotorCharacterization<Meter>
+) {
 
     private var lastTime = -1.0
     private var prevState = listOf(
@@ -24,11 +26,15 @@ class SwerveTrajectoryController(private val kinematics: SwerveDriveKinematics,
     private val strafeController = PidController(2.0, 0.0)
     private val rotationController = PidController(0.5, 0.0) // rad per sec per radian of error
 
-    fun calculate(time: Double, state: Trajectory.State, targetHeading: Rotation2d,
-                  currentPose: Pose2d): SwerveDriveOutput.TrajectoryTrackerOutput {
+    fun calculate(
+        time: Double,
+        state: Trajectory.State,
+        targetHeading: Rotation2d,
+        currentPose: Pose2d
+    ): SwerveDriveOutput.TrajectoryTrackerOutput {
 
         // dt
-        if(lastTime < 0.0) lastTime = time
+        if (lastTime < 0.0) lastTime = time
         val dt = time - lastTime
 
         // Our wanted position on the field
@@ -72,7 +78,5 @@ class SwerveTrajectoryController(private val kinematics: SwerveDriveKinematics,
         return SwerveDriveOutput.TrajectoryTrackerOutput(
                 outputs[0], outputs[1], outputs[2], outputs[3]
         )
-
     }
-
 }

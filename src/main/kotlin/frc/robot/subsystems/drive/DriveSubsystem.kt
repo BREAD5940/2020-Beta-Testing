@@ -42,21 +42,23 @@ object DriveSubsystem : FalconSubsystem() {
             1.inches,
             (1.0 / (4.0 * Math.PI / 60.0 * 15.0 / 20.0 * 24.0 / 38.0 * 18.0)).nativeUnits)
 
+    val kAzumithMotorOutputRange = -0.5..0.5
+
     val flModule = Mk2SwerveModule(0, 0, 0.radians, FalconMAX(
             CANSparkMax(10, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
-            0.5, 0.0001)
+            0.5,0.0, 0.0001, kAzumithMotorOutputRange)
 
     val frModule = Mk2SwerveModule(1, 1, 0.radians, FalconMAX(
             CANSparkMax(11, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
-            0.5, 0.0001)
+            0.5,0.0, 0.0001, kAzumithMotorOutputRange)
 
     private val blModule = Mk2SwerveModule(2, 2, 0.radians, FalconMAX(
             CANSparkMax(12, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
-            0.5, 0.0001)
+            0.5,0.0, 0.0001, kAzumithMotorOutputRange)
 
     private val brModule = Mk2SwerveModule(3, 3, 0.radians, FalconMAX(
             CANSparkMax(13, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
-            0.5, 0.0001)
+            0.5,0.0, 0.0001, kAzumithMotorOutputRange)
 
     val modules = listOf(flModule, frModule, blModule, brModule)
 
@@ -86,7 +88,7 @@ object DriveSubsystem : FalconSubsystem() {
     }
 
     val robotPosition get() = periodicIO.pose
-    
+
     override fun periodic() {
         if (!kinematicsUpdateJob.isActive) kinematicsUpdateJob.start()
 
@@ -96,8 +98,8 @@ object DriveSubsystem : FalconSubsystem() {
     }
 
     fun followTrajectory(trajectory: Trajectory, endHeading: Rotation2d, mirrored: Boolean = false) =
-            SwerveTrajectoryFollowerCommand(if(mirrored) trajectory.mirror() else trajectory,
-                    if(mirrored) endHeading.mirror() else endHeading)
+            SwerveTrajectoryFollowerCommand(if (mirrored) trajectory.mirror() else trajectory,
+                    if (mirrored) endHeading.mirror() else endHeading)
 
     fun followTrajectory(trajectory: Trajectory, endHeading: Rotation2d, mirrored: BooleanSource) =
             SwerveTrajectoryFollowerCommand(trajectory, endHeading, mirrored)
@@ -185,22 +187,22 @@ sealed class SwerveDriveOutput {
     object Nothing : SwerveDriveOutput()
 
     class Percent(
-            val chassisSpeed: ChassisSpeeds
+        val chassisSpeed: ChassisSpeeds
     ) : SwerveDriveOutput()
 
     class Velocity(
-            val chassisSpeed: ChassisSpeeds
+        val chassisSpeed: ChassisSpeeds
     ) : SwerveDriveOutput()
 
     class KinematicsVelocity(
-            val speeds: List<SwerveModuleState>
+        val speeds: List<SwerveModuleState>
     ) : SwerveDriveOutput()
 
     class TrajectoryTrackerOutput(
-            val flState: Mk2SwerveModule.Output.Velocity,
-            val frState: Mk2SwerveModule.Output.Velocity,
-            val blState: Mk2SwerveModule.Output.Velocity,
-            val brState: Mk2SwerveModule.Output.Velocity
+        val flState: Mk2SwerveModule.Output.Velocity,
+        val frState: Mk2SwerveModule.Output.Velocity,
+        val blState: Mk2SwerveModule.Output.Velocity,
+        val brState: Mk2SwerveModule.Output.Velocity
     ) : SwerveDriveOutput() {
         constructor() : this (
                 Mk2SwerveModule.Output.Velocity(),

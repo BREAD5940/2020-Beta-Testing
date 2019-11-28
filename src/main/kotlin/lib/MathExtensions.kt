@@ -2,11 +2,11 @@ package lib
 
 import edu.wpi.first.wpilibj.geometry.Rotation2d
 import edu.wpi.first.wpilibj.geometry.Translation2d
-import org.ghrobotics.lib.mathematics.kEpsilon
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.hypot
 import kotlin.math.sign
+import org.ghrobotics.lib.mathematics.kEpsilon
 
 fun Rotation2d.toTranslation() = Translation2d(this.cos, this.sin)
 
@@ -42,7 +42,7 @@ fun Translation2d.normalize(): Translation2d {
     return if (this.norm.absoluteValue < kEpsilon) this else this * (1.0 / norm)
 }
 
-fun Rotation2d.inverse() = Rotation2d(cos, -sin);
+fun Rotation2d.inverse() = Rotation2d(cos, -sin)
 
 fun Rotation2d.distance(other: Rotation2d): Rotation2d {
     val inverse = Rotation2d(cos, -sin)
@@ -66,7 +66,7 @@ fun Translation2d.interpolate(other: Translation2d, x: Double): Translation2d {
 }
 
 fun Translation2d.extrapolate(other: Translation2d, x: Double) =
-        Translation2d(x * (other.x - x) + x, x * (other.y - y) + y);
+        Translation2d(x * (other.x - x) + x, x * (other.y - y) + y)
 
 fun dot_(a: Translation2d, b: Translation2d): Double {
     return a.x * b.x + a.y * b.y

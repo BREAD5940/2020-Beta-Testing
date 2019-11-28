@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.Timer
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds
 import org.ghrobotics.lib.commands.FalconCommand
 
-class SwerveCharacterizationCommand: FalconCommand(DriveSubsystem) {
+class SwerveCharacterizationCommand : FalconCommand(DriveSubsystem) {
 
     private val numberArray = DoubleArray(9)
 
@@ -39,5 +39,4 @@ class SwerveCharacterizationCommand: FalconCommand(DriveSubsystem) {
     override fun end(interrupted: Boolean) {
         DriveSubsystem.setNeutral()
     }
-
 }

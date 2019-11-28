@@ -7,13 +7,13 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics
 import frc.robot.Constants
 import frc.robot.Controls
-import lib.*
+import kotlin.math.absoluteValue
+import kotlin.math.sign
+import lib.* // ktlint-disable no-wildcard-imports
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.utils.withDeadband
 import org.ghrobotics.lib.wrappers.hid.getX
 import org.ghrobotics.lib.wrappers.hid.getY
-import kotlin.math.absoluteValue
-import kotlin.math.sign
 
 class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
 
@@ -39,8 +39,8 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
 
         // check evasion and determine wheels if necessary
         val wantsEvasion = evadingButton()
-        if(wantsEvasion) {
-            if(!wasEvading) { // determine evasion wheels if we weren't previously evading. Doing this twice is a Bad Idea
+        if (wantsEvasion) {
+            if (!wasEvading) { // determine evasion wheels if we weren't previously evading. Doing this twice is a Bad Idea
                 wasEvading = true
                 determineEvasionWheels(translation, DriveSubsystem.periodicIO.pose)
             }
@@ -50,7 +50,7 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
             } else if (sign < -0.5) {
                 centerOfRotation = counterClockwiseCenter
             }
-        } else  { // we don't want evasion
+        } else { // we don't want evasion
             if (wasEvading) { // toggle out if we were previously evading
                 centerOfRotation = Translation2d()
                 wasEvading = false
@@ -95,4 +95,3 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
         var centerOfRotation = Translation2d()
     }
 }
-
