@@ -25,9 +25,9 @@ class Mk2SwerveModule(val name: String) {
         set(value) { periodicIO.desiredOutput = value }
 
     fun updateState() {
-        periodicIO.state = SwerveModuleState(
-                periodicIO.desiredOutput.velocity.value,
-                periodicIO.desiredOutput.angle)
+//        periodicIO.state = SwerveModuleState(
+//                periodicIO.desiredOutput.velocity.value,
+//                periodicIO.desiredOutput.angle)
     }
 
     fun useState() {
@@ -47,6 +47,11 @@ class Mk2SwerveModule(val name: String) {
             is Output.Velocity -> {
 //                driveMotor.setVelocity(customizedOutput.velocity, customizedOutput.arbitraryFeedForward)
                 ntVelocityEntry.setDouble(customizedOutput.velocity.inFeetPerSecond())
+
+                periodicIO.state = SwerveModuleState(
+                        customizedOutput.velocity.value,
+                        customizedOutput.angle
+                )
             }
         }
 
@@ -67,10 +72,10 @@ class Mk2SwerveModule(val name: String) {
         // inverted so the total movement of the module
         // is less than 90 deg by inverting the wheel direction
         val delta = targetAngle - currentAngle
-        if(name == "fl" && delta.degrees > 1e-2) println("delta ${delta.degrees}")
+//        if(name == "fl" && delta.degrees > 1e-2) println("delta ${delta.degrees}")
         if (delta.degrees > 90.0 || delta.degrees < -90.0) {
             output.reverse()
-            if(name == "fl") println(" | reversing fl!")
+            if(name == "fl") println("reversing fl!")
         }
         return output
     }
