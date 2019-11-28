@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.geometry.Pose2d
 import edu.wpi.first.wpilibj.geometry.Translation2d
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import frc.robot.Constants
 import frc.robot.Controls
 import lib.*
@@ -32,15 +33,15 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
         val strafe = -zSource()
         val rotation = -rotSource() * 6.0
 
-        println("commanding forward $forward strafe $strafe rotation $rotation")
+//        println("commanding forward $forward strafe $strafe rotation $rotation")
 
         // calculate translation vector (with magnitude of the max speed
         // volts divided by volts per meter per second is meters per second
-        println("Scaler ${(12.0 / DriveSubsystem.feedForward.kV.value)}")
+//        println("Scaler ${(12.0 / DriveSubsystem.feedForward.kV.value)}")
         var translation = Translation2d(forward, strafe) * (12.0 / DriveSubsystem.feedForward.kV.value) // this will have a norm of 1
         val magnitude = translation.norm
 
-        println("chassis velocity: ${magnitude.meters.inFeet()}")
+//        println("chassis velocity: ${magnitude.meters.inFeet()}")
 
         // snap translation power to poles if we're close to them
         if ((translation.toRotation2d().distance(translation.toRotation2d().nearestPole())).radians.absoluteValue
@@ -50,6 +51,7 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
 
         // check evasion and determine wheels if necessary
         val wantsEvasion = evadingButton()
+        SmartDashboard.putBoolean("evade?", wantsEvasion)
         if(wantsEvasion) {
             if(!wasEvading) { // determine evasion wheels if we weren't previously evading. Doing this twice is a Bad Idea
                 wasEvading = true
@@ -82,18 +84,34 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
 
     /** Determine which wheels to use to evade. */
     private fun determineEvasionWheels(driveVector: Translation2d, robotPosition: Pose2d) {
-        val here: Translation2d = driveVector.rotateBy(robotPosition.rotation.inverse())
-        val wheels = Constants.kModulePositions
-        clockwiseCenter = wheels[0]
-        counterClockwiseCenter = wheels[wheels.size - 1]
-        for (i in 0 until wheels.size - 1) {
-            val cw = wheels[i]
-            val ccw = wheels[i + 1]
-            if (here.isWithinAngle(cw, ccw)) {
-                clockwiseCenter = ccw
-                counterClockwiseCenter = cw
-            }
-        }
+
+        val wheels = Constants.kModulePositions // fl, fr, bl, br
+        val robotRelativeDriveVector = driveVector.rotateBy(robotPosition.rotation.inverse()).toRotation2d().radians
+
+        println("robotRelativeDriveVector $robotRelativeDriveVector")
+//
+        // choose the wheels
+        var angles = wheels.map { it.toRotation2d().radians }
+        if(robotRelativeDriveVector < angles[0] && robotRelativeDriveVector > angles[1]) {
+            println("trying to go forward, choosing wheels fl and fr")
+            this.clockwiseCenter = wheels[1]
+            this.counterClockwiseCenter = wheels[0]
+        } else {
+            println("heck")
+    }
+
+//        val here: Translation2d = driveVector.rotateBy(robotPosition.rotation.inverse()).normalize()
+//        val wheels = Constants.kModulePositions
+//        clockwiseCenter = wheels[0]
+//        counterClockwiseCenter = wheels[wheels.size - 1]
+//        for (i in 0 until wheels.size - 1) {
+//            val cw = wheels[i].normalize()
+//            val ccw = wheels[i + 1].normalize()
+////            if (here.isWithinAngle(cw, ccw)) {
+////                clockwiseCenter = ccw
+////                counterClockwiseCenter = cw
+////            }
+//        }
     }
 
     companion object {

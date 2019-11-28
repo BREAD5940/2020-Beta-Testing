@@ -6,13 +6,14 @@ import edu.wpi.first.wpilibj.RobotController
 import edu.wpi.first.wpilibj.Spark
 import edu.wpi.first.wpilibj.geometry.Rotation2d
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import kotlin.math.PI
 import lib.PidController
 import org.ghrobotics.lib.mathematics.units.* // ktlint-disable no-wildcard-imports
 import org.ghrobotics.lib.mathematics.units.derived.* // ktlint-disable no-wildcard-imports
 import org.ghrobotics.lib.motors.rev.FalconMAX
 
-class Mk2SwerveModule {
+class Mk2SwerveModule(val name: String) {
 
     private val stateMutex = Object()
     protected val periodicIO = PeriodicIO()
@@ -45,8 +46,12 @@ class Mk2SwerveModule {
 //            }
             is Output.Velocity -> {
 //                driveMotor.setVelocity(customizedOutput.velocity, customizedOutput.arbitraryFeedForward)
+                ntVelocityEntry.setDouble(customizedOutput.velocity.inFeetPerSecond())
             }
         }
+
+        ntAngleEntry.setDouble(customizedOutput.angle.degrees)
+
     }
 
     /**
@@ -57,13 +62,15 @@ class Mk2SwerveModule {
         var targetAngle = output.angle
         val currentAngle = periodicIO.state.angle
 
+        // The delta should already be [-pi, pi]
         // Deltas that are greater than 90 deg or less than -90 deg can be
         // inverted so the total movement of the module
         // is less than 90 deg by inverting the wheel direction
         val delta = targetAngle - currentAngle
+        if(name == "fl" && delta.degrees > 1e-2) println("delta ${delta.degrees}")
         if (delta.degrees > 90.0 || delta.degrees < -90.0) {
-            targetAngle += 180.degrees.toRotation2d()
             output.reverse()
+            if(name == "fl") println(" | reversing fl!")
         }
         return output
     }
@@ -96,4 +103,10 @@ class Mk2SwerveModule {
             }
         }
     }
+
+    val ntAngleEntry = SmartDashboard.getEntry("${name}_angle")
+    val ntVelocityEntry = SmartDashboard.getEntry("${name}_velocity")
+//    suspend fun outputToSmartDashboard() {
+//        ntAngleEntry.setDouble()
+//    }
 }

@@ -40,19 +40,19 @@ object DriveSubsystem : FalconSubsystem() {
             1.inches,
             (1.0 / (4.0 * Math.PI / 60.0 * 15.0 / 20.0 * 24.0 / 38.0 * 18.0)).nativeUnits)
 
-    private val flModule = Mk2SwerveModule()//0, 0, 0.radians, FalconMAX(
+    private val flModule = Mk2SwerveModule("fl")//0, 0, 0.radians, FalconMAX(
 //            CANSparkMax(10, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
 //            0.5, 0.0001)
 
-    private val frModule = Mk2SwerveModule()//1, 1, 0.radians, FalconMAX(
+    private val frModule = Mk2SwerveModule("fr")//1, 1, 0.radians, FalconMAX(
 //            CANSparkMax(11, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
 //            0.5, 0.0001)
 
-    private val blModule = Mk2SwerveModule()//2, 2, 0.radians, FalconMAX(
+    private val blModule = Mk2SwerveModule("bl")//2, 2, 0.radians, FalconMAX(
 //            CANSparkMax(12, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
 //            0.5, 0.0001)
 
-    private val brModule = Mk2SwerveModule()//3, 3, 0.radians, FalconMAX(
+    private val brModule = Mk2SwerveModule("br")//3, 3, 0.radians, FalconMAX(
 //            CANSparkMax(13, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
 //            0.5, 0.0001)
 

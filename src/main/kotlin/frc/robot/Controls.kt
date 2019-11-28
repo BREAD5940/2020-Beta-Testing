@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.robot.autonomous.paths.TrajectoryWaypoints
 import frc.robot.subsystems.drive.DriveSubsystem
 import frc.robot.subsystems.drive.SwerveTrajectoryFollowerCommand
+import frc.robot.subsystems.drive.VisionDriveCommand
 import org.ghrobotics.lib.commands.sequential
 import org.ghrobotics.lib.mathematics.twodim.geometry.mirror
 import org.ghrobotics.lib.mathematics.twodim.trajectory.FalconTrajectoryConfig
@@ -32,16 +33,18 @@ object Controls {
         button(kB).changeOn(
                 command
         )
+
+        button(kBumperRight).change(VisionDriveCommand())
     }
 
-    val operatorWPIJoystick = XboxController(1)
-    val operatorFalconXbox = operatorWPIJoystick.mapControls {
-    }
+//    val operatorWPIJoystick = XboxController(1)
+//    val operatorFalconXbox = operatorWPIJoystick.mapControls {
+//    }
 
     fun update() {
         driverFalconXbox.update()
 //        operatorFalconHID.update()
-        operatorFalconXbox.update()
+//        operatorFalconXbox.update()
     }
 }
 

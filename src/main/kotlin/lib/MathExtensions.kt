@@ -3,6 +3,7 @@ package lib
 import edu.wpi.first.wpilibj.geometry.Rotation2d
 import edu.wpi.first.wpilibj.geometry.Translation2d
 import org.ghrobotics.lib.mathematics.kEpsilon
+import java.lang.RuntimeException
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.hypot
@@ -120,6 +121,19 @@ fun Translation2d.isWithinAngle(A: Translation2d, C: Translation2d, vertical: Bo
     return isWithinAngle(A, Translation2d(), C, vertical)
 }
 
-fun Translation2d.isWithinAngle(A: Translation2d, C: Translation2d): Boolean {
-    return isWithinAngle(A, C, false)
+//fun Translation2d.isWithinAngle(A: Translation2d, C: Translation2d): Boolean {
+//    return isWithinAngle(A, C, false)
+//}
+
+fun Translation2d.isWithinAngle(leftBound: Translation2d, rightBound: Translation2d): Boolean {
+    val thisAngle = this.toRotation2d().radians
+    val leftAngle = leftBound.toRotation2d().radians
+    val rightAngle = rightBound.toRotation2d().radians
+
+    if(leftAngle < rightAngle) {
+        return thisAngle > leftAngle && thisAngle < rightAngle
+    }
+    return thisAngle < leftAngle && thisAngle > rightAngle
+
+    // this is between the ccw and cw vectors if this angle is below the ccw angle and above the cwAngle
 }
