@@ -2,6 +2,8 @@ package lib
 
 import kotlin.math.abs
 
+@Deprecated("2910 PidController is depreciated", ReplaceWith("PIDController",
+        "edu.wpi.first.wpilibj.controller.PIDController"))
 class PidController(private val kP: Double, private val kD: Double) {
 
     private var setpoint: Double = 0.0

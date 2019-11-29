@@ -1,5 +1,6 @@
 package frc.robot.subsystems.drive.swerve
 
+import edu.wpi.first.wpilibj.controller.PIDController
 import edu.wpi.first.wpilibj.geometry.Pose2d
 import edu.wpi.first.wpilibj.geometry.Rotation2d
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds
@@ -8,7 +9,6 @@ import edu.wpi.first.wpilibj.kinematics.SwerveModuleState
 import edu.wpi.first.wpilibj.trajectory.Trajectory
 import frc.robot.subsystems.drive.SwerveDriveOutput
 import frc.robot.subsystems.drive.toTranslation2d
-import lib.PidController
 import org.ghrobotics.lib.mathematics.units.Meter
 import org.ghrobotics.lib.mathematics.units.SIUnit
 import org.ghrobotics.lib.physics.MotorCharacterization
@@ -22,9 +22,9 @@ class SwerveTrajectoryController(
     private var prevState = listOf(
             SwerveModuleState(), SwerveModuleState(), SwerveModuleState(), SwerveModuleState())
 
-    private val forwardController = PidController(2.0, 0.0) // x meters per second per meter of error
-    private val strafeController = PidController(2.0, 0.0)
-    private val rotationController = PidController(0.5, 0.0) // rad per sec per radian of error
+    private val forwardController = PIDController(2.0, 0.0) // x meters per second per meter of error
+    private val strafeController = PIDController(2.0, 0.0)
+    private val rotationController = PIDController(0.5, 0.0) // rad per sec per radian of error
 
     fun calculate(
         time: Double,

@@ -5,25 +5,22 @@ import edu.wpi.first.wpilibj.AnalogInput
 import edu.wpi.first.wpilibj.RobotController
 import edu.wpi.first.wpilibj.Spark
 import edu.wpi.first.wpilibj.controller.PIDController
-import edu.wpi.first.wpilibj.controller.ProfiledPIDController
 import edu.wpi.first.wpilibj.geometry.Rotation2d
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile
 import kotlin.math.PI
-import lib.PidController
 import org.ghrobotics.lib.mathematics.units.* // ktlint-disable no-wildcard-imports
 import org.ghrobotics.lib.mathematics.units.derived.* // ktlint-disable no-wildcard-imports
 import org.ghrobotics.lib.motors.rev.FalconMAX
 
 open class Mk2SwerveModule(
-        azimuthPAMPort: Int,
-        azimuthAnalogPort: Int,
-        private val offset: SIUnit<Radian>,
-        val driveMotor: FalconMAX<Meter>,
-        angleKp: Double,
-        angleKi: Double,
-        angleKd: Double,
-        private val angleMotorOutputRange: ClosedFloatingPointRange<Double>
+    azimuthPAMPort: Int,
+    azimuthAnalogPort: Int,
+    private val offset: SIUnit<Radian>,
+    val driveMotor: FalconMAX<Meter>,
+    angleKp: Double,
+    angleKi: Double,
+    angleKd: Double,
+    private val angleMotorOutputRange: ClosedFloatingPointRange<Double>
 ) {
 
     private val stateMutex = Object()
@@ -125,8 +122,8 @@ open class Mk2SwerveModule(
         }
 
         class Percent(
-                val percent: Double,
-                angle: Rotation2d
+            val percent: Double,
+            angle: Rotation2d
         ) : Output(angle) {
             override fun reverse(): Output {
                 return Percent(-percent, angle + 180.degrees.toRotation2d())
@@ -134,9 +131,9 @@ open class Mk2SwerveModule(
         }
 
         class Velocity(
-                val velocity: SIUnit<LinearVelocity>,
-                angle: Rotation2d,
-                val arbitraryFeedForward: SIUnit<Volt> = 0.volts
+            val velocity: SIUnit<LinearVelocity>,
+            angle: Rotation2d,
+            val arbitraryFeedForward: SIUnit<Volt> = 0.volts
         ) : Output(angle) {
             constructor() : this(0.meters.velocity, 0.degrees.toRotation2d(), 0.volts)
 

@@ -1,5 +1,6 @@
 package frc.robot.subsystems.drive
 
+import edu.wpi.first.wpilibj.controller.PIDController
 import edu.wpi.first.wpilibj.geometry.Rotation2d
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds
 import frc.robot.Constants
@@ -7,13 +8,11 @@ import frc.robot.autonomous.paths.TrajectoryWaypoints
 import frc.robot.autonomous.paths.transformBy
 import kotlin.math.PI
 import kotlin.math.absoluteValue
-import lib.PidController
 import lib.normalize
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.mathematics.units.derived.radians
 import org.ghrobotics.lib.mathematics.units.derived.toRotation2d
-import org.ghrobotics.lib.mathematics.units.feet
-import org.ghrobotics.lib.mathematics.units.inMeters
+import org.ghrobotics.lib.mathematics.units.kFeetToMeter
 
 class VisionDriveCommand : FalconCommand(DriveSubsystem) {
 
@@ -21,25 +20,24 @@ class VisionDriveCommand : FalconCommand(DriveSubsystem) {
 
     override fun runsWhenDisabled() = true
 
-    private val rotationController = PidController(10.0, 0.0) // rad per sec per radian of error
+    private val rotationController = PIDController(10.0, 0.0, 0.0) // rad per sec per radian of error
             .apply {
-                setInputRange(0.0, 2.0 * PI)
-                setContinuous(true)
-                setOutputRange(-2 * PI, 2 * PI)
+                enableContinuousInput(-PI, PI)
             }
-    private val translationController = PidController(100.0, 0.0)
-            .apply {
-                setOutputRange(-4.feet.inMeters(), 4.feet.inMeters())
-            }
+    private val translationController = PIDController(100.0, 0.0, 0.0)
+
+    val rotationRange = -2 * PI..2 * PI
+    val translationOutputRange = -4 * kFeetToMeter..4 * kFeetToMeter
 
     override fun initialize() {
         targetHeading = (importantAngles.minBy { (it - DriveSubsystem.robotPosition.rotation.radians).absoluteValue })!!.radians.toRotation2d()
-        rotationController.setSetpoint(targetHeading.radians)
-        translationController.setSetpoint(0.0)
+        rotationController.setpoint = targetHeading.radians
+        translationController.setpoint = 0.0
     }
 
     override fun execute() {
-        val turn = rotationController.calculate(DriveSubsystem.robotPosition.rotation.radians, 0.020)
+        val turn = rotationController.calculate(DriveSubsystem.robotPosition.rotation.radians)
+                .coerceIn(rotationRange)
 
         val targetPose = TrajectoryWaypoints.kRocketN.transformBy(Constants.kIntakeToCenter) // TODO get from limelight
         val currentPose = DriveSubsystem.robotPosition
@@ -48,7 +46,7 @@ class VisionDriveCommand : FalconCommand(DriveSubsystem) {
 
         println("target $targetPose current $currentPose error $error")
 
-        val targetVelocity = translationController.calculate(error.norm, 0.020)
+        val targetVelocity = translationController.calculate(error.norm, 0.020).coerceIn(translationOutputRange)
         error = error.normalize()
         val vX = -error.x * targetVelocity
         val vY = -error.y * targetVelocity
