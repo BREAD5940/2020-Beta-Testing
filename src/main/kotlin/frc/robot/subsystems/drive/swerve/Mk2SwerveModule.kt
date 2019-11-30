@@ -24,7 +24,7 @@ open class Mk2SwerveModule(
 ) {
 
     private val stateMutex = Object()
-    protected val periodicIO = PeriodicIO()
+    val periodicIO = PeriodicIO()
         get() = synchronized(stateMutex) { field }
 
     val state get() = periodicIO.state
@@ -66,7 +66,11 @@ open class Mk2SwerveModule(
 //        azimuthController.setSetpoint(customizedOutput.angle.radians)
         val angleOutput = azimuthController.calculate(
                 periodicIO.state.angle.radians, customizedOutput.angle.radians)
-        azimuthMotor.set(angleOutput.coerceIn(angleMotorOutputRange))
+        val nextAzimuthOutput = angleOutput.coerceIn(angleMotorOutputRange)
+        azimuthMotor.set(nextAzimuthOutput)
+
+        periodicIO.lastError = azimuthController.positionError.radians.toRotation2d()
+        periodicIO.lastAzimuthOutput = nextAzimuthOutput
 
         // check if we should reverse the angle
         when (customizedOutput) {
@@ -75,6 +79,9 @@ open class Mk2SwerveModule(
             }
             is Output.Percent -> {
                 driveMotor.setDutyCycle(customizedOutput.percent)
+            }
+            is Output.Voltage -> {
+                driveMotor.setVoltage(customizedOutput.voltage)
             }
             is Output.Velocity -> {
                 driveMotor.setVelocity(customizedOutput.velocity, customizedOutput.arbitraryFeedForward)
@@ -100,7 +107,7 @@ open class Mk2SwerveModule(
         return output
     }
 
-    protected class PeriodicIO {
+    class PeriodicIO {
         /**
          * The current state of this module, updating by the [updateState] method.
          */
@@ -111,6 +118,16 @@ open class Mk2SwerveModule(
          * in the [useState] method.
          */
         var desiredOutput: Output = Output.Nothing
+
+        /**
+         * The last error of the azimuth
+         */
+        var lastError = Rotation2d()
+
+        /**
+         * The last output of the azimuth motor
+         */
+        var lastAzimuthOutput = 0.0
     }
 
     sealed class Output(val angle: Rotation2d) {
@@ -127,6 +144,15 @@ open class Mk2SwerveModule(
         ) : Output(angle) {
             override fun reverse(): Output {
                 return Percent(-percent, angle + 180.degrees.toRotation2d())
+            }
+        }
+
+        class Voltage(
+                val voltage: SIUnit<Volt>,
+                angle: Rotation2d
+        ) : Output(angle) {
+            override fun reverse(): Output {
+                return Voltage(-voltage, angle + 180.degrees.toRotation2d())
             }
         }
 

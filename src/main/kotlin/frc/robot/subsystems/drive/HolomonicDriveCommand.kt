@@ -24,11 +24,11 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
     override fun execute() {
         val forward = -xSource()
         val strafe = -zSource()
-        val rotation = -rotSource() * 6.0
+        val rotation = -rotSource() * 2.0
 
         // calculate translation vector (with magnitude of the max speed
         // volts divided by volts per meter per second is meters per second
-        var translation = Translation2d(forward, strafe) * (12.0 / DriveSubsystem.feedForward.kV.value) // this will have a norm of 1
+        var translation = Translation2d(forward, strafe) * (12.0) // this will have a norm of 12, our max voltage
         val magnitude = translation.norm
 
         // snap translation power to poles if we're close to them
@@ -62,11 +62,10 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
         val moduleStates = DriveSubsystem.kinematics.toSwerveModuleStates(speeds, centerOfRotation)
 
         // Normalize wheel speeds
-        // volts per meter per second times meters per seconds gives volts
-        SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates,
-                DriveSubsystem.feedForward.kV.value * 12.0)
+        // Max voltage we can apply is 12 volts
+        SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates,12.0)
 
-        DriveSubsystem.periodicIO.output = SwerveDriveOutput.KinematicsVelocity(moduleStates.toList())
+        DriveSubsystem.periodicIO.output = SwerveDriveOutput.KinematicsVoltage(moduleStates.toList())
     }
 
     /** Determine which wheels to use to evade. */

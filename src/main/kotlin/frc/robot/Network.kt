@@ -5,10 +5,12 @@
 
 package frc.robot
 
+import edu.wpi.first.wpilibj.RobotController
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab
 import frc.robot.autonomous.Autonomous
+import frc.robot.subsystems.drive.DriveSubsystem
 import org.ghrobotics.lib.wrappers.networktables.enumSendableChooser
 
 object Network {
@@ -19,35 +21,32 @@ object Network {
     private val mainShuffleboardDisplay: ShuffleboardTab = Shuffleboard.getTab("CROISSANT")
 
     private val autoLayout = mainShuffleboardDisplay.getLayout("Autonomous", BuiltInLayouts.kList)
-            .withSize(2, 2)
             .withPosition(0, 0)
+            .withSize(2, 2)
 
-//    private val localizationLayout = mainShuffleboardDisplay.getLayout("Localization", BuiltInLayouts.kList)
-//            .withSize(2, 2)
-//            .withPosition(2, 0)
+//    private val visionLayout = mainShuffleboardDisplay.getLayout("Vision", BuiltInLayouts.kGrid)
+//            .withSize(3, 3)
+//            .withPosition(0, 2)
 
-    private val visionLayout = mainShuffleboardDisplay.getLayout("Vision", BuiltInLayouts.kGrid)
-            .withSize(3, 3)
-            .withPosition(0, 2)
+    private val driveSubsystemLayout = mainShuffleboardDisplay.getLayout("Drive", BuiltInLayouts.kGrid)
+            .withPosition(4, 0)
+            .withSize(2, 4)
 
-//    private val driveSubsystemLayout = mainShuffleboardDisplay.getLayout("Drive", BuiltInLayouts.kGrid)
-//            .withSize(2, 2)
-//            .withPosition(4, 0)
+    private val flAngle = driveSubsystemLayout.add("FL Angle (deg)", 0.0).entry
+    private val frAngle = driveSubsystemLayout.add("FR Angle (deg)", 0.0).entry
+    private val brAngle = driveSubsystemLayout.add("BR Angle (deg)", 0.0).entry
+    private val blAngle = driveSubsystemLayout.add("BL Angle (deg)", 0.0).entry
 
-    private val elevatorSubsystemLayout = mainShuffleboardDisplay.getLayout("Elevator", BuiltInLayouts.kGrid)
-            .withSize(3, 4)
-            .withPosition(6, 0)
+    private val flAzumithOutput = driveSubsystemLayout.add("FL Azumith Output (volts)", 0.0).entry
+    private val frAzumithOutput = driveSubsystemLayout.add("FR Azumith Output (volts)", 0.0).entry
+    private val brAzumithOutput = driveSubsystemLayout.add("BR Azumith Output (volts)", 0.0).entry
+    private val blAzumithOutput = driveSubsystemLayout.add("BL Azumith Output (volts)", 0.0).entry
 
-//    private val jointPosition = elevatorSubsystemLayout.add("total state", SuperstructureState().asString()).entry
-    private val elevatorPosition = elevatorSubsystemLayout.add("Position (in)", 0.0).entry
-    private val elevatorSetpoint = elevatorSubsystemLayout.add("Setpoint (in)", 0.0).entry
-    private val elevatorVelocity = elevatorSubsystemLayout.add("Velocity (ips)", 0.0).entry
+    private val flAzumithError = driveSubsystemLayout.add("FL Error (deg)", 0.0).entry
+    private val frAzumithError = driveSubsystemLayout.add("FR Error (deg)", 0.0).entry
+    private val brAzumithError = driveSubsystemLayout.add("BR Error (deg)", 0.0).entry
+    private val blAzumithError = driveSubsystemLayout.add("BL Error (deg)", 0.0).entry
 
-    val autoVisionP = visionLayout.add("Auto kP", 0.0).entry
-    val autoVisionD = visionLayout.add("Auto kD", 0.0).entry
-
-    val visionDriveAngle = visionLayout.add("Vision Drive Angle", 0.0).entry
-    val visionDriveActive = visionLayout.add("Vision Drive Active", false).entry
 
     init {
 
@@ -55,23 +54,29 @@ object Network {
         autoModeChooser.setDefaultOption(Autonomous.Mode.DO_NOTHING.name, Autonomous.Mode.DO_NOTHING)
 
         // Put choosers on dashboard
-        autoLayout.add(
-                "Auto Mode",
-                autoModeChooser
-        )
-        autoLayout.add(
-                "Starting Position",
-                startingPositionChooser
-        )
+        autoLayout.add("Auto Mode", autoModeChooser)
+        autoLayout.add("Starting Position", startingPositionChooser)
+
+
     }
 
     fun update() {
-//        elevatorPosition.setDouble(Elevator.currentState.position.inch)
-//        elevatorVelocity.setDouble(Elevator.currentState.velocity.inchesPerSecond)
-//        elevatorSetpoint.setDouble(let {
-//            val wantedState = Elevator.wantedState as? WantedState.Position<*> ?: return@let 0.0
-//            wantedState.targetPosition.value / kInchToMeter
-//        })
-//        jointPosition.setString(Superstructure.currentState.toString())
+        with(DriveSubsystem) {
+            flAngle.setDouble(flModule.state.angle.degrees)
+            frAngle.setDouble(frModule.state.angle.degrees)
+            brAngle.setDouble(brModule.state.angle.degrees)
+            blAngle.setDouble(blModule.state.angle.degrees)
+
+            flAzumithError.setDouble(flModule.periodicIO.lastError.degrees)
+            frAzumithError.setDouble(frModule.periodicIO.lastError.degrees)
+            brAzumithError.setDouble(brModule.periodicIO.lastError.degrees)
+            blAzumithError.setDouble(blModule.periodicIO.lastError.degrees)
+
+            val volts = RobotController.getBatteryVoltage()
+            flAzumithOutput.setDouble(flModule.periodicIO.lastAzimuthOutput * volts)
+            frAzumithOutput.setDouble(frModule.periodicIO.lastAzimuthOutput * volts)
+            brAzumithOutput.setDouble(brModule.periodicIO.lastAzimuthOutput * volts)
+            blAzumithOutput.setDouble(blModule.periodicIO.lastAzimuthOutput * volts)
+        }
     }
 }

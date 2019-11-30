@@ -52,11 +52,11 @@ object DriveSubsystem : FalconSubsystem() {
             CANSparkMax(11, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0, 0.0001, kAzumithMotorOutputRange)
 
-    private val blModule = Mk2SwerveModule(2, 2, 0.radians, FalconMAX(
+    val blModule = Mk2SwerveModule(2, 2, 0.radians, FalconMAX(
             CANSparkMax(12, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0, 0.0001, kAzumithMotorOutputRange)
 
-    private val brModule = Mk2SwerveModule(3, 3, 0.radians, FalconMAX(
+    val brModule = Mk2SwerveModule(3, 3, 0.radians, FalconMAX(
             CANSparkMax(13, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0, 0.0001, kAzumithMotorOutputRange)
 
@@ -79,6 +79,8 @@ object DriveSubsystem : FalconSubsystem() {
         get() = synchronized(stateLock) { field }
 
     override fun lateInit() {
+        // set the default comand
+        defaultCommand = HolomonicDriveCommand()
 
         // update localization f a s t
         this.kinematicsUpdateJob = GlobalScope.launchFrequency(200) {
@@ -147,6 +149,24 @@ object DriveSubsystem : FalconSubsystem() {
                     module.output = Mk2SwerveModule.Output.Velocity(SIUnit(states[index].speedMetersPerSecond), states[index].angle)
                 }
             }
+            is SwerveDriveOutput.KinematicsVoltage -> {
+                flModule.output = Mk2SwerveModule.Output.Voltage(
+                        SIUnit(output.speeds[0].speedMetersPerSecond),
+                        output.speeds[0].angle
+                )
+                frModule.output = Mk2SwerveModule.Output.Voltage(
+                        SIUnit(output.speeds[1].speedMetersPerSecond),
+                        output.speeds[1].angle
+                )
+                brModule.output = Mk2SwerveModule.Output.Voltage(
+                        SIUnit(output.speeds[2].speedMetersPerSecond),
+                        output.speeds[2].angle
+                )
+                blModule.output = Mk2SwerveModule.Output.Voltage(
+                        SIUnit(output.speeds[3].speedMetersPerSecond),
+                        output.speeds[3].angle
+                )
+            }
             is SwerveDriveOutput.KinematicsVelocity -> {
                 flModule.output = Mk2SwerveModule.Output.Velocity(
                         SIUnit(output.speeds[0].speedMetersPerSecond),
@@ -197,6 +217,10 @@ sealed class SwerveDriveOutput {
     class KinematicsVelocity(
         val speeds: List<SwerveModuleState>
     ) : SwerveDriveOutput()
+
+    class KinematicsVoltage(
+            val speeds: List<SwerveModuleState>
+    ): SwerveDriveOutput()
 
     class TrajectoryTrackerOutput(
         val flState: Mk2SwerveModule.Output.Velocity,

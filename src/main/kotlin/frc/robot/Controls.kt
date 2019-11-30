@@ -10,17 +10,17 @@ object Controls {
 
     val driverControllerLowLevel = XboxController(0)
     val driverFalconXbox = driverControllerLowLevel.mapControls {
-        button(kX).changeOn(InstantCommand(Runnable { println("Hullo!") }))
+//        button(kX).changeOn(InstantCommand(Runnable { println("Hullo!") }))
     }
 
-    val operatorWPIJoystick = XboxController(1)
-    val operatorFalconXbox = operatorWPIJoystick.mapControls {
-    }
+//    val operatorWPIJoystick = XboxController(1)
+//    val operatorFalconXbox = operatorWPIJoystick.mapControls {
+//    }
 
     fun update() {
         driverFalconXbox.update()
 //        operatorFalconHID.update()
-        operatorFalconXbox.update()
+//        operatorFalconXbox.update()
     }
 }
 
