@@ -37,15 +37,15 @@ object Network {
     private val brAngle = driveSubsystemLayout.add("BR Angle (deg)", 0.0).entry
     private val blAngle = driveSubsystemLayout.add("BL Angle (deg)", 0.0).entry
 
-    private val flAzumithOutput = driveSubsystemLayout.add("FL Azumith Output (volts)", 0.0).entry
-    private val frAzumithOutput = driveSubsystemLayout.add("FR Azumith Output (volts)", 0.0).entry
-    private val brAzumithOutput = driveSubsystemLayout.add("BR Azumith Output (volts)", 0.0).entry
-    private val blAzumithOutput = driveSubsystemLayout.add("BL Azumith Output (volts)", 0.0).entry
+    private val flAzimuthOutput = driveSubsystemLayout.add("FL Azumith Output (volts)", 0.0).entry
+    private val frAzimuthOutput = driveSubsystemLayout.add("FR Azumith Output (volts)", 0.0).entry
+    private val brAzimuthOutput = driveSubsystemLayout.add("BR Azumith Output (volts)", 0.0).entry
+    private val blAzimuthOutput = driveSubsystemLayout.add("BL Azumith Output (volts)", 0.0).entry
 
-    private val flAzumithError = driveSubsystemLayout.add("FL Error (deg)", 0.0).entry
-    private val frAzumithError = driveSubsystemLayout.add("FR Error (deg)", 0.0).entry
-    private val brAzumithError = driveSubsystemLayout.add("BR Error (deg)", 0.0).entry
-    private val blAzumithError = driveSubsystemLayout.add("BL Error (deg)", 0.0).entry
+    private val flAzimuthError = driveSubsystemLayout.add("FL Error (deg)", 0.0).entry
+    private val frAzimuthError = driveSubsystemLayout.add("FR Error (deg)", 0.0).entry
+    private val brAzimuthError = driveSubsystemLayout.add("BR Error (deg)", 0.0).entry
+    private val blAzimuthError = driveSubsystemLayout.add("BL Error (deg)", 0.0).entry
 
 
     init {
@@ -67,16 +67,16 @@ object Network {
             brAngle.setDouble(brModule.state.angle.degrees)
             blAngle.setDouble(blModule.state.angle.degrees)
 
-            flAzumithError.setDouble(flModule.periodicIO.lastError.degrees)
-            frAzumithError.setDouble(frModule.periodicIO.lastError.degrees)
-            brAzumithError.setDouble(brModule.periodicIO.lastError.degrees)
-            blAzumithError.setDouble(blModule.periodicIO.lastError.degrees)
+            flAzimuthError.setDouble(flModule.periodicIO.lastError.degrees)
+            frAzimuthError.setDouble(frModule.periodicIO.lastError.degrees)
+            brAzimuthError.setDouble(brModule.periodicIO.lastError.degrees)
+            blAzimuthError.setDouble(blModule.periodicIO.lastError.degrees)
 
             val volts = RobotController.getBatteryVoltage()
-            flAzumithOutput.setDouble(flModule.periodicIO.lastAzimuthOutput * volts)
-            frAzumithOutput.setDouble(frModule.periodicIO.lastAzimuthOutput * volts)
-            brAzumithOutput.setDouble(brModule.periodicIO.lastAzimuthOutput * volts)
-            blAzumithOutput.setDouble(blModule.periodicIO.lastAzimuthOutput * volts)
+            flAzimuthOutput.setDouble(flModule.periodicIO.lastAzimuthOutput * volts)
+            frAzimuthOutput.setDouble(frModule.periodicIO.lastAzimuthOutput * volts)
+            brAzimuthOutput.setDouble(brModule.periodicIO.lastAzimuthOutput * volts)
+            blAzimuthOutput.setDouble(blModule.periodicIO.lastAzimuthOutput * volts)
         }
     }
 }
