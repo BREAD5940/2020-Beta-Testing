@@ -24,6 +24,7 @@ import org.ghrobotics.lib.mathematics.twodim.geometry.y_u
 import org.ghrobotics.lib.mathematics.twodim.trajectory.mirror
 import org.ghrobotics.lib.mathematics.units.Meter
 import org.ghrobotics.lib.mathematics.units.SIUnit
+import org.ghrobotics.lib.mathematics.units.derived.degrees
 import org.ghrobotics.lib.mathematics.units.derived.radians
 import org.ghrobotics.lib.mathematics.units.inFeet
 import org.ghrobotics.lib.mathematics.units.inches
@@ -34,6 +35,7 @@ import org.ghrobotics.lib.physics.MotorCharacterization
 import org.ghrobotics.lib.utils.BooleanSource
 import org.ghrobotics.lib.utils.asSource
 import org.ghrobotics.lib.utils.launchFrequency
+import kotlin.math.roundToInt
 
 object DriveSubsystem : FalconSubsystem() {
 
@@ -43,21 +45,21 @@ object DriveSubsystem : FalconSubsystem() {
             1.inches,
             (1.0 / (4.0 * Math.PI / 60.0 * 15.0 / 20.0 * 24.0 / 38.0 * 18.0)).nativeUnits)
 
-    val kAzumithMotorOutputRange = -0.5..0.5
+    val kAzumithMotorOutputRange = -0.1..0.1 // -0.5..0.5
 
-    val flModule = Mk2SwerveModule(3, 2, 0.radians, FalconMAX(
+    val flModule = Mk2SwerveModule(3, 2, 142.degrees + 76.degrees, FalconMAX(
             CANSparkMax(10, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0, 0.0001, kAzumithMotorOutputRange)
 
-    val frModule = Mk2SwerveModule(5, 1, 0.radians, FalconMAX(
+    val frModule = Mk2SwerveModule(5, 1, 88.degrees, FalconMAX(
             CANSparkMax(11, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0, 0.0001, kAzumithMotorOutputRange)
 
-    val blModule = Mk2SwerveModule(1, 4, 0.radians, FalconMAX(
+    val blModule = Mk2SwerveModule(1, 0, 92.degrees, FalconMAX(
             CANSparkMax(12, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0, 0.0001, kAzumithMotorOutputRange)
 
-    val brModule = Mk2SwerveModule(0, 3, 0.radians, FalconMAX(
+    val brModule = Mk2SwerveModule(0, 3, 40.degrees, FalconMAX(
             CANSparkMax(13, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0, 0.0001, kAzumithMotorOutputRange)
 
@@ -83,7 +85,7 @@ object DriveSubsystem : FalconSubsystem() {
         // set the default comand
 //        defaultCommand = HolomonicDriveCommand()
         defaultCommand = RunCommand(Runnable{
-            periodicIO.output = SwerveDriveOutput.Percent(ChassisSpeeds(1.0, 0.0, 0.0))
+            periodicIO.output = SwerveDriveOutput.Nothing //SwerveDriveOutput.Percent(ChassisSpeeds(0.0, 0.0, 0.0))
         }, this)
 
         // update localization f a s t
@@ -102,6 +104,7 @@ object DriveSubsystem : FalconSubsystem() {
             if (!job.isActive) job.start()
         }
 
+        println("fl ${flModule.azimuthAngle().degrees.roundToInt()} fr ${frModule.azimuthAngle().degrees.roundToInt()} bl ${blModule.azimuthAngle().degrees.roundToInt()} br ${brModule.azimuthAngle().degrees.roundToInt()}")
 
         FalconDashboard.robotHeading = robotPosition.rotation.radians
         FalconDashboard.robotX = robotPosition.translation.x_u.inFeet()
