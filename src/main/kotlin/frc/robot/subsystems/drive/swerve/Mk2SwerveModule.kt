@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.kinematics.SwerveModuleState
 import kotlin.math.PI
 import org.ghrobotics.lib.mathematics.units.* // ktlint-disable no-wildcard-imports
 import org.ghrobotics.lib.mathematics.units.derived.* // ktlint-disable no-wildcard-imports
+import org.ghrobotics.lib.mathematics.units.nativeunit.DefaultNativeUnitModel
 import org.ghrobotics.lib.motors.rev.FalconMAX
 
 open class Mk2SwerveModule(
@@ -32,7 +33,8 @@ open class Mk2SwerveModule(
         get() = periodicIO.desiredOutput
         set(value) { periodicIO.desiredOutput = value }
 
-    private val azimuthMotor = Spark(azimuthPWMPort)
+//    private val azimuthMotor = Spark(azimuthPWMPort)
+    private val azimuthMotor = FalconMAX(azimuthPWMPort, CANSparkMaxLowLevel.MotorType.kBrushless, DefaultNativeUnitModel)
     private val azimuthController =
             PIDController(angleKp, angleKi, angleKd).apply {
                 //                setInputRange(0.0, 2.0 * PI)
@@ -46,7 +48,21 @@ open class Mk2SwerveModule(
             { ((1.0 - analogInput.voltage / RobotController.getVoltage5V() * 2.0 * PI).radians + offset).toRotation2d() }
 
     init {
+        driveMotor.canSparkMax.restoreFactoryDefaults()
+        driveMotor.canSparkMax.setSecondaryCurrentLimit(60.0)
+        driveMotor.canSparkMax.setSmartCurrentLimit(40)
+
         driveMotor.canSparkMax.apply {
+            setSmartCurrentLimit(60)
+            setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 500)
+            setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 3)
+        }
+
+        azimuthMotor.canSparkMax.restoreFactoryDefaults()
+        azimuthMotor.canSparkMax.setSecondaryCurrentLimit(60.0)
+        azimuthMotor.canSparkMax.setSmartCurrentLimit(40)
+
+        azimuthMotor.canSparkMax.apply {
             setSmartCurrentLimit(60)
             setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 500)
             setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 3)
@@ -67,26 +83,34 @@ open class Mk2SwerveModule(
         val angleOutput = azimuthController.calculate(
                 periodicIO.state.angle.radians, customizedOutput.angle.radians)
         val nextAzimuthOutput = angleOutput.coerceIn(angleMotorOutputRange)
-        azimuthMotor.set(nextAzimuthOutput)
+
+//        azimuthMotor.set(0.2)
+        println("swerve next angle out $nextAzimuthOutput")
+
+//        azimuthMotor.set(nextAzimuthOutput)
+        azimuthMotor.setDutyCycle(nextAzimuthOutput)
 
         periodicIO.lastError = azimuthController.positionError.radians.toRotation2d()
         periodicIO.lastAzimuthOutput = nextAzimuthOutput
 
+//        driveMotor.setDutyCycle(0.2)
+        driveMotor.setNeutral()
+
         // check if we should reverse the angle
-        when (customizedOutput) {
-            is Output.Nothing -> {
-                driveMotor.setNeutral()
-            }
-            is Output.Percent -> {
-                driveMotor.setDutyCycle(customizedOutput.percent)
-            }
-            is Output.Voltage -> {
-                driveMotor.setVoltage(customizedOutput.voltage)
-            }
-            is Output.Velocity -> {
-                driveMotor.setVelocity(customizedOutput.velocity, customizedOutput.arbitraryFeedForward)
-            }
-        }
+//        when (customizedOutput) {
+//            is Output.Nothing -> {
+//                driveMotor.setNeutral()
+//            }
+//            is Output.Percent -> {
+//                driveMotor.setDutyCycle(customizedOutput.percent)
+//            }
+//            is Output.Voltage -> {
+//                driveMotor.setVoltage(customizedOutput.voltage)
+//            }
+//            is Output.Velocity -> {
+//                driveMotor.setVelocity(customizedOutput.velocity, customizedOutput.arbitraryFeedForward)
+//            }
+//        }
     }
 
     /**
