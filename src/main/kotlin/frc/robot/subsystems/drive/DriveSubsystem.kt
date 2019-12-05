@@ -53,7 +53,7 @@ object DriveSubsystem : FalconSubsystem() {
             CANSparkMax(11, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0, 0.0001, kAzumithMotorOutputRange)
 
-    val blModule = Mk2SwerveModule(1, 2, 0.radians, FalconMAX(
+    val blModule = Mk2SwerveModule(1, 4, 0.radians, FalconMAX(
             CANSparkMax(12, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0, 0.0001, kAzumithMotorOutputRange)
 
@@ -68,7 +68,7 @@ object DriveSubsystem : FalconSubsystem() {
             SIUnit(0.0),
             SIUnit(0.0)
     ).apply {
-        TODO("idk -- need to tune dis. Should be per module!")
+//        TODO("idk -- need to tune dis. Should be per module!")
     }
 
     val kinematics = Constants.kinematics
@@ -84,7 +84,7 @@ object DriveSubsystem : FalconSubsystem() {
 //        defaultCommand = HolomonicDriveCommand()
         defaultCommand = RunCommand(Runnable{
             periodicIO.output = SwerveDriveOutput.Percent(ChassisSpeeds(1.0, 0.0, 0.0))
-        })
+        }, this)
 
         // update localization f a s t
         this.kinematicsUpdateJob = GlobalScope.launchFrequency(200) {
@@ -96,7 +96,12 @@ object DriveSubsystem : FalconSubsystem() {
     val robotPosition get() = periodicIO.pose
 
     override fun periodic() {
-        if (!kinematicsUpdateJob.isActive) kinematicsUpdateJob.start()
+
+        val job = kinematicsUpdateJob
+        if((job) != null) {
+            if (!job.isActive) job.start()
+        }
+
 
         FalconDashboard.robotHeading = robotPosition.rotation.radians
         FalconDashboard.robotX = robotPosition.translation.x_u.inFeet()
@@ -116,7 +121,7 @@ object DriveSubsystem : FalconSubsystem() {
         periodicIO.output = SwerveDriveOutput.Nothing
     }
 
-    var kinematicsUpdateJob: Job
+    var kinematicsUpdateJob: Job? = null
     private fun updateState() {
         modules.forEach { it.updateState() }
 

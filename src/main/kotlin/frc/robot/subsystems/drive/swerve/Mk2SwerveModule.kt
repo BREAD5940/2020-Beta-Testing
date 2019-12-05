@@ -13,7 +13,7 @@ import org.ghrobotics.lib.mathematics.units.derived.* // ktlint-disable no-wildc
 import org.ghrobotics.lib.motors.rev.FalconMAX
 
 open class Mk2SwerveModule(
-    azimuthPAMPort: Int,
+    azimuthPWMPort: Int,
     azimuthAnalogPort: Int,
     private val offset: SIUnit<Radian>,
     val driveMotor: FalconMAX<Meter>,
@@ -32,7 +32,7 @@ open class Mk2SwerveModule(
         get() = periodicIO.desiredOutput
         set(value) { periodicIO.desiredOutput = value }
 
-    private val azimuthMotor = Spark(azimuthPAMPort)
+    private val azimuthMotor = Spark(azimuthPWMPort)
     private val azimuthController =
             PIDController(angleKp, angleKi, angleKd).apply {
                 //                setInputRange(0.0, 2.0 * PI)
