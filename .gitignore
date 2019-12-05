@@ -27,3 +27,8 @@ build/*
 .idea/*
 .idea
 .DS_Store
+bin
+.settings
+.wpilib
+.project
+.classpath
