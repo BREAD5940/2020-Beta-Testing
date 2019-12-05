@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState
 import edu.wpi.first.wpilibj.trajectory.Trajectory
+import edu.wpi.first.wpilibj2.command.RunCommand
 import frc.robot.Constants
 import frc.robot.subsystems.drive.swerve.Mk2SwerveModule
 import kotlinx.coroutines.GlobalScope
@@ -44,19 +45,19 @@ object DriveSubsystem : FalconSubsystem() {
 
     val kAzumithMotorOutputRange = -0.5..0.5
 
-    val flModule = Mk2SwerveModule(0, 0, 0.radians, FalconMAX(
+    val flModule = Mk2SwerveModule(3, 2, 0.radians, FalconMAX(
             CANSparkMax(10, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0, 0.0001, kAzumithMotorOutputRange)
 
-    val frModule = Mk2SwerveModule(1, 1, 0.radians, FalconMAX(
+    val frModule = Mk2SwerveModule(5, 1, 0.radians, FalconMAX(
             CANSparkMax(11, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0, 0.0001, kAzumithMotorOutputRange)
 
-    val blModule = Mk2SwerveModule(2, 2, 0.radians, FalconMAX(
+    val blModule = Mk2SwerveModule(1, 2, 0.radians, FalconMAX(
             CANSparkMax(12, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0, 0.0001, kAzumithMotorOutputRange)
 
-    val brModule = Mk2SwerveModule(3, 3, 0.radians, FalconMAX(
+    val brModule = Mk2SwerveModule(0, 3, 0.radians, FalconMAX(
             CANSparkMax(13, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0, 0.0001, kAzumithMotorOutputRange)
 
@@ -80,7 +81,10 @@ object DriveSubsystem : FalconSubsystem() {
 
     override fun lateInit() {
         // set the default comand
-        defaultCommand = HolomonicDriveCommand()
+//        defaultCommand = HolomonicDriveCommand()
+        defaultCommand = RunCommand(Runnable{
+            periodicIO.output = SwerveDriveOutput.Percent(ChassisSpeeds(1.0, 0.0, 0.0))
+        })
 
         // update localization f a s t
         this.kinematicsUpdateJob = GlobalScope.launchFrequency(200) {
