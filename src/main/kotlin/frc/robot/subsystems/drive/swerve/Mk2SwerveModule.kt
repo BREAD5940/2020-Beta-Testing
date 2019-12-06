@@ -78,42 +78,43 @@ open class Mk2SwerveModule(
 
     fun useState() {
 
-        val customizedOutput = customizeAngle(periodicIO.desiredOutput)
+        val customizedOutput = periodicIO.desiredOutput //customizeAngle(periodicIO.desiredOutput) // TODO reverse
 //        azimuthController.setSetpoint(customizedOutput.angle.radians)
         val angleOutput = azimuthController.calculate(
                 periodicIO.state.angle.radians, customizedOutput.angle.radians)
         val nextAzimuthOutput = angleOutput.coerceIn(angleMotorOutputRange)
 
 //        azimuthMotor.set(0.2)
-        println("swerve next angle out $nextAzimuthOutput")
+//        println("swerve next angle out $nextAzimuthOutput")
 
 //        azimuthMotor.set(nextAzimuthOutput)
-//        azimuthMotor.setDutyCycle(nextAzimuthOutput)
+        azimuthMotor.setDutyCycle(nextAzimuthOutput)
 //        azimuthMotor.setDutyCycle(0.2)
 
 
         periodicIO.lastError = azimuthController.positionError.radians.toRotation2d()
         periodicIO.lastAzimuthOutput = nextAzimuthOutput
 
-        driveMotor.setDutyCycle(0.2)
+//        driveMotor.setDutyCycle(0.0)
 
 //        driveMotor.setNeutral()
 
         // check if we should reverse the angle
-//        when (customizedOutput) {
-//            is Output.Nothing -> {
-//                driveMotor.setNeutral()
-//            }
-//            is Output.Percent -> {
-//                driveMotor.setDutyCycle(customizedOutput.percent)
-//            }
-//            is Output.Voltage -> {
-//                driveMotor.setVoltage(customizedOutput.voltage)
-//            }
+        when (customizedOutput) {
+            is Output.Nothing -> {
+                driveMotor.setNeutral()
+            }
+            is Output.Percent -> {
+                println("setting duty cycle ${customizedOutput.percent}")
+                driveMotor.setDutyCycle(customizedOutput.percent)
+            }
+            is Output.Voltage -> {
+                driveMotor.setVoltage(customizedOutput.voltage)
+            }
 //            is Output.Velocity -> {
 //                driveMotor.setVelocity(customizedOutput.velocity, customizedOutput.arbitraryFeedForward)
 //            }
-//        }
+        }
     }
 
     /**

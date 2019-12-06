@@ -22,50 +22,30 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
     private var counterClockwiseCenter = Translation2d()
 
     override fun execute() {
-        val forward = -xSource()
-        val strafe = -zSource()
-        val rotation = -rotSource() * 2.0
+        val forward = -xSource() / 6.0
+        val strafe = -zSource() / 6.0
+        val rotation = -rotSource() * 1.0 / 6.0
 
         // calculate translation vector (with magnitude of the max speed
         // volts divided by volts per meter per second is meters per second
-        var translation = Translation2d(forward, strafe) * (12.0) // this will have a norm of 12, our max voltage
-        val magnitude = translation.norm
+        val translation = Translation2d(forward, strafe) // this will have a norm of 1, or 100% power
 
-        // snap translation power to poles if we're close to them
-        if ((translation.toRotation2d().distance(translation.toRotation2d().nearestPole())).radians.absoluteValue
-                < Math.toRadians(10.0)) {
-            translation = translation.toRotation2d().nearestPole().toTranslation() * magnitude
-        }
-
-        // check evasion and determine wheels if necessary
-        val wantsEvasion = evadingButton()
-        if (wantsEvasion) {
-            if (!wasEvading) { // determine evasion wheels if we weren't previously evading. Doing this twice is a Bad Idea
-                wasEvading = true
-                determineEvasionWheels(translation, DriveSubsystem.periodicIO.pose)
-            }
-            val sign = sign(rotation)
-            if (sign > 0.5) {
-                centerOfRotation = clockwiseCenter
-            } else if (sign < -0.5) {
-                centerOfRotation = counterClockwiseCenter
-            }
-        } else { // we don't want evasion
-            if (wasEvading) { // toggle out if we were previously evading
-                centerOfRotation = Translation2d()
-                wasEvading = false
-            }
+        if(forward.absoluteValue < 0.01 && strafe.absoluteValue < 0.01 && rotation.absoluteValue < 0.01) {
+            DriveSubsystem.periodicIO.output = SwerveDriveOutput.Nothing
+            return
         }
 
         // calculate wheel speeds from field oriented chassis state
         val speeds = ChassisSpeeds.fromFieldRelativeSpeeds(translation.x, translation.y, rotation, DriveSubsystem.periodicIO.pose.rotation)
-        val moduleStates = DriveSubsystem.kinematics.toSwerveModuleStates(speeds, centerOfRotation)
+//        val moduleStates = DriveSubsystem.kinematics.toSwerveModuleStates(speeds, centerOfRotation)
 
         // Normalize wheel speeds
-        // Max voltage we can apply is 12 volts
-        SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates,12.0)
+        // Max duty cycle is 1.0
+//        SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates,1.0)
 
-        DriveSubsystem.periodicIO.output = SwerveDriveOutput.KinematicsVoltage(moduleStates.toList())
+        println("speeds ${speeds.toString2()}")
+
+        DriveSubsystem.periodicIO.output = SwerveDriveOutput.Percent(speeds)
     }
 
     /** Determine which wheels to use to evade. */
@@ -85,12 +65,16 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
     }
 
     companion object {
-        val xSource by lazy { Controls.driverFalconXbox.getY(GenericHID.Hand.kLeft).withDeadband(0.02) }
-        val zSource by lazy { Controls.driverFalconXbox.getX(GenericHID.Hand.kLeft).withDeadband(0.02) }
-        val rotSource by lazy { Controls.driverFalconXbox.getX(GenericHID.Hand.kRight).withDeadband(0.06) }
+        val xSource by lazy { Controls.driverFalconXbox.getY(GenericHID.Hand.kRight).withDeadband(0.02) }
+        val zSource by lazy { Controls.driverFalconXbox.getX(GenericHID.Hand.kRight).withDeadband(0.02) }
+        val rotSource by lazy { Controls.driverFalconXbox.getX(GenericHID.Hand.kLeft).withDeadband(0.06) }
 
         val evadingButton by lazy { Controls.driverFalconXbox.getRawButton(11) } // TODO check
 
         var centerOfRotation = Translation2d()
     }
+}
+
+private fun ChassisSpeeds.toString2(): String {
+    return "Speeds vx $vxMetersPerSecond vy $vyMetersPerSecond omega $omegaRadiansPerSecond"
 }

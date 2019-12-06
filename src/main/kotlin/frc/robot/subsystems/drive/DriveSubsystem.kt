@@ -47,20 +47,20 @@ object DriveSubsystem : FalconSubsystem() {
 
     val kAzumithMotorOutputRange = -0.5..0.5
 
-    val flModule = Mk2SwerveModule(5, 2, 142.degrees + 76.degrees, FalconMAX(
+    val flModule = Mk2SwerveModule(2, 2, 142.degrees + 76.degrees, FalconMAX(
             CANSparkMax(1, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0, 0.0001, kAzumithMotorOutputRange)
 
-    val frModule = Mk2SwerveModule(6, 1, 88.degrees, FalconMAX(
-            CANSparkMax(2, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
-            0.5, 0.0, 0.0001, kAzumithMotorOutputRange)
-
-    val blModule = Mk2SwerveModule(7, 0, 92.degrees, FalconMAX(
+    val frModule = Mk2SwerveModule(4, 1, 88.degrees, FalconMAX(
             CANSparkMax(3, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0, 0.0001, kAzumithMotorOutputRange)
 
-    val brModule = Mk2SwerveModule(8, 3, 40.degrees, FalconMAX(
-            CANSparkMax(4, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
+    val blModule = Mk2SwerveModule(8, 0, 92.degrees, FalconMAX(
+            CANSparkMax(7, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
+            0.5, 0.0, 0.0001, kAzumithMotorOutputRange)
+
+    val brModule = Mk2SwerveModule(6, 3, 40.degrees, FalconMAX(
+            CANSparkMax(5, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0, 0.0001, kAzumithMotorOutputRange)
 
     val modules = listOf(flModule, frModule, blModule, brModule)
@@ -82,11 +82,16 @@ object DriveSubsystem : FalconSubsystem() {
         get() = synchronized(stateLock) { field }
 
     override fun lateInit() {
+
+        flModule.driveMotor.canSparkMax.inverted = false
+        blModule.driveMotor.canSparkMax.inverted = false
+        brModule.driveMotor.canSparkMax.inverted = true
+
         // set the default comand
-//        defaultCommand = HolomonicDriveCommand()
-        defaultCommand = RunCommand(Runnable{
-            periodicIO.output = SwerveDriveOutput.Nothing //SwerveDriveOutput.Percent(ChassisSpeeds(0.0, 0.0, 0.0))
-        }, this)
+        defaultCommand = HolomonicDriveCommand()
+//        defaultCommand = RunCommand(Runnable{
+//            periodicIO.output = SwerveDriveOutput.Nothing //SwerveDriveOutput.Percent(ChassisSpeeds(0.0, 0.0, 0.0))
+//        }, this)
 
         // update localization f a s t
         this.kinematicsUpdateJob = GlobalScope.launchFrequency(200) {
@@ -104,7 +109,7 @@ object DriveSubsystem : FalconSubsystem() {
             if (!job.isActive) job.start()
         }
 
-        println("fl ${flModule.azimuthAngle().degrees.roundToInt()} fr ${frModule.azimuthAngle().degrees.roundToInt()} bl ${blModule.azimuthAngle().degrees.roundToInt()} br ${brModule.azimuthAngle().degrees.roundToInt()}")
+//        println("fl ${flModule.azimuthAngle().degrees.roundToInt()} bl ${blModule.azimuthAngle().degrees.roundToInt()} br ${brModule.azimuthAngle().degrees.roundToInt()}")
 
         FalconDashboard.robotHeading = robotPosition.rotation.radians
         FalconDashboard.robotX = robotPosition.translation.x_u.inFeet()
@@ -151,9 +156,22 @@ object DriveSubsystem : FalconSubsystem() {
                 val states = kinematics.toSwerveModuleStates(output.chassisSpeed)
                 SwerveDriveKinematics.normalizeWheelSpeeds(states, 1.0)
 
-                modules.forEachIndexed { index, module ->
-                    module.output = Mk2SwerveModule.Output.Percent(states[index].speedMetersPerSecond, states[index].angle)
-                }
+                flModule.output = Mk2SwerveModule.Output.Percent(
+                        states[0].speedMetersPerSecond,
+                        states[0].angle
+                )
+                frModule.output = Mk2SwerveModule.Output.Percent(
+                        states[1].speedMetersPerSecond,
+                        states[1].angle
+                )
+                brModule.output = Mk2SwerveModule.Output.Percent(
+                        states[2].speedMetersPerSecond,
+                        states[2].angle
+                )
+                blModule.output = Mk2SwerveModule.Output.Percent(
+                        states[3].speedMetersPerSecond,
+                        states[3].angle
+                )
             }
             is SwerveDriveOutput.Velocity -> {
                 val states = kinematics.toSwerveModuleStates(output.chassisSpeed)

@@ -30,7 +30,7 @@ object Network {
 
     private val driveSubsystemLayout = mainShuffleboardDisplay.getLayout("Drive", BuiltInLayouts.kGrid)
             .withPosition(4, 0)
-            .withSize(2, 4)
+            .withSize(4, 3)
 
     private val flAngle = driveSubsystemLayout.add("FL Angle (deg)", 0.0).entry
     private val frAngle = driveSubsystemLayout.add("FR Angle (deg)", 0.0).entry
@@ -63,18 +63,18 @@ object Network {
     fun update() {
         with(DriveSubsystem) {
             flAngle.setDouble(flModule.state.angle.degrees)
-            frAngle.setDouble(frModule.state.angle.degrees)
+//            frAngle.setDouble(frModule.state.angle.degrees)
             brAngle.setDouble(brModule.state.angle.degrees)
             blAngle.setDouble(blModule.state.angle.degrees)
 
             flAzimuthError.setDouble(flModule.periodicIO.lastError.degrees)
-            frAzimuthError.setDouble(frModule.periodicIO.lastError.degrees)
+//            frAzimuthError.setDouble(frModule.periodicIO.lastError.degrees)
             brAzimuthError.setDouble(brModule.periodicIO.lastError.degrees)
             blAzimuthError.setDouble(blModule.periodicIO.lastError.degrees)
 
             val volts = RobotController.getBatteryVoltage()
             flAzimuthOutput.setDouble(flModule.periodicIO.lastAzimuthOutput * volts)
-            frAzimuthOutput.setDouble(frModule.periodicIO.lastAzimuthOutput * volts)
+//            frAzimuthOutput.setDouble(frModule.periodicIO.lastAzimuthOutput * volts)
             brAzimuthOutput.setDouble(brModule.periodicIO.lastAzimuthOutput * volts)
             blAzimuthOutput.setDouble(blModule.periodicIO.lastAzimuthOutput * volts)
         }
