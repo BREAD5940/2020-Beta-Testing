@@ -70,9 +70,11 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
     }
 
     companion object {
-        val xSource by lazy { Controls.driverFalconXbox.getY(GenericHID.Hand.kRight).withDeadband(0.1) }
-        val zSource by lazy { Controls.driverFalconXbox.getX(GenericHID.Hand.kRight).withDeadband(0.1) }
-        val rotSource by lazy { Controls.driverFalconXbox.getX(GenericHID.Hand.kLeft).withDeadband(0.06) }
+        private val kTranslationHand = GenericHID.Hand.kLeft
+        private val kRotHand = GenericHID.Hand.kRight
+        val xSource by lazy { Controls.driverFalconXbox.getY(kTranslationHand).withDeadband(0.1) }
+        val zSource by lazy { Controls.driverFalconXbox.getX(kTranslationHand).withDeadband(0.1) }
+        val rotSource by lazy { Controls.driverFalconXbox.getX(kRotHand).withDeadband(0.06) }
 
         val evadingButton by lazy { Controls.driverFalconXbox.getRawButton(11) } // TODO check
 
