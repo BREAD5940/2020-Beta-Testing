@@ -4,11 +4,9 @@ import edu.wpi.first.wpilibj.GenericHID
 import edu.wpi.first.wpilibj.geometry.Pose2d
 import edu.wpi.first.wpilibj.geometry.Translation2d
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds
-import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics
 import frc.robot.Constants
 import frc.robot.Controls
 import kotlin.math.absoluteValue
-import kotlin.math.sign
 import lib.* // ktlint-disable no-wildcard-imports
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.utils.withDeadband
@@ -31,7 +29,7 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
         // volts divided by volts per meter per second is meters per second
         val translation = Translation2d(forward, strafe) // this will have a norm of 1, or 100% power
 
-        if(forward.absoluteValue < 0.01 && strafe.absoluteValue < 0.01 && rotation.absoluteValue < 0.01) {
+        if (forward.absoluteValue < 0.01 && strafe.absoluteValue < 0.01 && rotation.absoluteValue < 0.01) {
             DriveSubsystem.periodicIO.output = SwerveDriveOutput.Nothing
 //            val states = DriveSubsystem.currentSwerveModuleStates
 //            DriveSubsystem.periodicIO.output = SwerveDriveOutput.KinematicsVelocity()
@@ -50,7 +48,7 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
 
         DriveSubsystem.periodicIO.output = SwerveDriveOutput.Percent(speeds)
 
-        this.lastSpeed = speeds;
+        this.lastSpeed = speeds
     }
 
     /** Determine which wheels to use to evade. */

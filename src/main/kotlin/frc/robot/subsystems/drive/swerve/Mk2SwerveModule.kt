@@ -3,7 +3,6 @@ package frc.robot.subsystems.drive.swerve
 import com.revrobotics.CANSparkMaxLowLevel
 import edu.wpi.first.wpilibj.AnalogInput
 import edu.wpi.first.wpilibj.RobotController
-import edu.wpi.first.wpilibj.Spark
 import edu.wpi.first.wpilibj.controller.PIDController
 import edu.wpi.first.wpilibj.geometry.Rotation2d
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState
@@ -91,7 +90,6 @@ open class Mk2SwerveModule(
         azimuthMotor.setDutyCycle(nextAzimuthOutput)
 //        azimuthMotor.setDutyCycle(0.2)
 
-
         periodicIO.lastError = azimuthController.positionError.radians.toRotation2d()
         periodicIO.lastAzimuthOutput = nextAzimuthOutput
 
@@ -175,8 +173,8 @@ open class Mk2SwerveModule(
         }
 
         class Voltage(
-                val voltage: SIUnit<Volt>,
-                angle: Rotation2d
+            val voltage: SIUnit<Volt>,
+            angle: Rotation2d
         ) : Output(angle) {
             override fun reverse(): Output {
                 return Voltage(-voltage, angle + 180.degrees.toRotation2d())

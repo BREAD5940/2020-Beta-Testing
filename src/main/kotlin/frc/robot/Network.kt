@@ -47,7 +47,6 @@ object Network {
     private val brAzimuthError = driveSubsystemLayout.add("BR Error (deg)", 0.0).entry
     private val blAzimuthError = driveSubsystemLayout.add("BL Error (deg)", 0.0).entry
 
-
     init {
 
         startingPositionChooser.setDefaultOption(Autonomous.StartingPositions.CENTER.name, Autonomous.StartingPositions.CENTER)
@@ -56,8 +55,6 @@ object Network {
         // Put choosers on dashboard
         autoLayout.add("Auto Mode", autoModeChooser)
         autoLayout.add("Starting Position", startingPositionChooser)
-
-
     }
 
     fun update() {

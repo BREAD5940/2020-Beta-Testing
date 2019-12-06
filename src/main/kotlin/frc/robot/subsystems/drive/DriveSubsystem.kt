@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState
 import edu.wpi.first.wpilibj.trajectory.Trajectory
-import edu.wpi.first.wpilibj2.command.RunCommand
 import frc.robot.Constants
 import frc.robot.subsystems.drive.swerve.Mk2SwerveModule
 import kotlinx.coroutines.GlobalScope
@@ -35,7 +34,6 @@ import org.ghrobotics.lib.physics.MotorCharacterization
 import org.ghrobotics.lib.utils.BooleanSource
 import org.ghrobotics.lib.utils.asSource
 import org.ghrobotics.lib.utils.launchFrequency
-import kotlin.math.roundToInt
 
 object DriveSubsystem : FalconSubsystem() {
 
@@ -109,7 +107,7 @@ object DriveSubsystem : FalconSubsystem() {
     override fun periodic() {
 
         val job = kinematicsUpdateJob
-        if((job) != null) {
+        if ((job) != null) {
             if (!job.isActive) job.start()
         }
 
@@ -255,8 +253,8 @@ sealed class SwerveDriveOutput {
     ) : SwerveDriveOutput()
 
     class KinematicsVoltage(
-            val speeds: List<SwerveModuleState>
-    ): SwerveDriveOutput()
+        val speeds: List<SwerveModuleState>
+    ) : SwerveDriveOutput()
 
     class TrajectoryTrackerOutput(
         val flState: Mk2SwerveModule.Output.Velocity,
