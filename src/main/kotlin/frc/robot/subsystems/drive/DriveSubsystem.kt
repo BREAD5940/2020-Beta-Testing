@@ -47,19 +47,19 @@ object DriveSubsystem : FalconSubsystem() {
 
     val kAzumithMotorOutputRange = -0.5..0.5
 
-    val flModule = Mk2SwerveModule(3, 2, 142.degrees + 76.degrees, FalconMAX(
+    val flModule = Mk2SwerveModule(5, 2, 142.degrees + 76.degrees, FalconMAX(
             CANSparkMax(1, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0, 0.0001, kAzumithMotorOutputRange)
 
-    val frModule = Mk2SwerveModule(5, 1, 88.degrees, FalconMAX(
+    val frModule = Mk2SwerveModule(6, 1, 88.degrees, FalconMAX(
             CANSparkMax(2, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0, 0.0001, kAzumithMotorOutputRange)
 
-    val blModule = Mk2SwerveModule(1, 0, 92.degrees, FalconMAX(
+    val blModule = Mk2SwerveModule(7, 0, 92.degrees, FalconMAX(
             CANSparkMax(3, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0, 0.0001, kAzumithMotorOutputRange)
 
-    val brModule = Mk2SwerveModule(0, 3, 40.degrees, FalconMAX(
+    val brModule = Mk2SwerveModule(8, 3, 40.degrees, FalconMAX(
             CANSparkMax(4, CANSparkMaxLowLevel.MotorType.kBrushless), driveNativeUnitModel),
             0.5, 0.0, 0.0001, kAzumithMotorOutputRange)
 

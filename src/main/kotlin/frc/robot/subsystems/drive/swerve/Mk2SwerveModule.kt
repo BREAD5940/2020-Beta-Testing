@@ -88,13 +88,16 @@ open class Mk2SwerveModule(
         println("swerve next angle out $nextAzimuthOutput")
 
 //        azimuthMotor.set(nextAzimuthOutput)
-        azimuthMotor.setDutyCycle(nextAzimuthOutput)
+//        azimuthMotor.setDutyCycle(nextAzimuthOutput)
+//        azimuthMotor.setDutyCycle(0.2)
+
 
         periodicIO.lastError = azimuthController.positionError.radians.toRotation2d()
         periodicIO.lastAzimuthOutput = nextAzimuthOutput
 
-//        driveMotor.setDutyCycle(0.2)
-        driveMotor.setNeutral()
+        driveMotor.setDutyCycle(0.2)
+
+//        driveMotor.setNeutral()
 
         // check if we should reverse the angle
 //        when (customizedOutput) {
