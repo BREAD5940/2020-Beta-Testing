@@ -99,7 +99,6 @@ open class Mk2SwerveModule(
 
 //        driveMotor.setNeutral()
 
-        // check if we should reverse the angle
         when (customizedOutput) {
             is Output.Nothing -> {
                 driveMotor.setNeutral()
@@ -130,7 +129,7 @@ open class Mk2SwerveModule(
         // is less than 90 deg by inverting the wheel direction
         val delta = targetAngle - currentAngle
         if (delta.degrees > 90.0 || delta.degrees < -90.0) {
-            output.reverse()
+            return output.reverse()
         }
         return output
     }
