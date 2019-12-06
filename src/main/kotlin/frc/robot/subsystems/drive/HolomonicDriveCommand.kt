@@ -17,6 +17,7 @@ import org.ghrobotics.lib.wrappers.hid.getY
 
 class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
 
+    private var lastSpeed: ChassisSpeeds = ChassisSpeeds()
     private var wasEvading = false
     private var clockwiseCenter = Translation2d()
     private var counterClockwiseCenter = Translation2d()
@@ -32,6 +33,8 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
 
         if(forward.absoluteValue < 0.01 && strafe.absoluteValue < 0.01 && rotation.absoluteValue < 0.01) {
             DriveSubsystem.periodicIO.output = SwerveDriveOutput.Nothing
+//            val states = DriveSubsystem.currentSwerveModuleStates
+//            DriveSubsystem.periodicIO.output = SwerveDriveOutput.KinematicsVelocity()
             return
         }
 
@@ -41,11 +44,13 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
 
         // Normalize wheel speeds
         // Max duty cycle is 1.0
-//        SwerveDriveKinematics.normalizeWheelSpeeds(moduleStates,1.0)
+//        SwerveDriveKinematics.normalizeWheelSpeeds(speeds,1.0)
 
         println("speeds ${speeds.toString2()}")
 
         DriveSubsystem.periodicIO.output = SwerveDriveOutput.Percent(speeds)
+
+        this.lastSpeed = speeds;
     }
 
     /** Determine which wheels to use to evade. */

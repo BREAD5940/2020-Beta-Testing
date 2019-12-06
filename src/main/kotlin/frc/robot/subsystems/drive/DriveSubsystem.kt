@@ -102,6 +102,8 @@ object DriveSubsystem : FalconSubsystem() {
         }
     }
 
+    val currentSwerveModuleStates get() = listOf(flModule.state, frModule.state, blModule.state, brModule.state)
+
     val robotPosition get() = periodicIO.pose
 
     override fun periodic() {
@@ -151,7 +153,9 @@ object DriveSubsystem : FalconSubsystem() {
         // and set module positions/outputs accordingly
         when (val output = periodicIO.output) {
             is SwerveDriveOutput.Nothing -> {
-                modules.forEach { it.output = Mk2SwerveModule.Output.Nothing }
+//                modules.forEach { it.output = Mk2SwerveModule.Output.Nothing }
+                val states = currentSwerveModuleStates
+                modules.forEachIndexed { i, module -> module.output = Mk2SwerveModule.Output.Percent(0.0, states[i].angle) }
             }
             is SwerveDriveOutput.Percent -> {
                 // normalize wheel speeds
