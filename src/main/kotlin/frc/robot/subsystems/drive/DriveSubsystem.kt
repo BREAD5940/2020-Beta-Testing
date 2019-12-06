@@ -84,8 +84,10 @@ object DriveSubsystem : FalconSubsystem() {
     override fun lateInit() {
 
         flModule.driveMotor.canSparkMax.inverted = false
+        frModule.driveMotor.canSparkMax.inverted = true
         blModule.driveMotor.canSparkMax.inverted = false
         brModule.driveMotor.canSparkMax.inverted = true
+        modules.forEach { it.driveMotor.brakeMode = true }
 
         // set the default comand
         defaultCommand = HolomonicDriveCommand()

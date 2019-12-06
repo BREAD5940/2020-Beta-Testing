@@ -78,7 +78,7 @@ open class Mk2SwerveModule(
 
     fun useState() {
 
-        val customizedOutput = periodicIO.desiredOutput //customizeAngle(periodicIO.desiredOutput) // TODO reverse
+        val customizedOutput = customizeAngle(periodicIO.desiredOutput) // TODO reverse
 //        azimuthController.setSetpoint(customizedOutput.angle.radians)
         val angleOutput = azimuthController.calculate(
                 periodicIO.state.angle.radians, customizedOutput.angle.radians)
