@@ -20,6 +20,7 @@ import org.ghrobotics.lib.mathematics.units.feet
 import org.ghrobotics.lib.mathematics.units.kFeetToMeter
 import org.ghrobotics.lib.physics.MotorCharacterization
 import org.junit.Test
+import org.knowm.xchart.SwingWrapper // ktlint-disable unused-import
 import org.knowm.xchart.XYChartBuilder
 
 class SwerveTrajectoryFollowerTest {
