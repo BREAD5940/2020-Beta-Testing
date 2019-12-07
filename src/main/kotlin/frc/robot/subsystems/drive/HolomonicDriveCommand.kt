@@ -21,9 +21,13 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
     private var counterClockwiseCenter = Translation2d()
 
     override fun execute() {
-        val forward = -xSource() / 1.0
-        val strafe = -zSource() / 1.0
-        val rotation = -rotSource() * 2.0 / 1.0
+        var forward = -xSource() / 1.0
+        var strafe = -zSource() / 1.0
+        var rotation = -rotSource() * 2.0 / 1.0
+
+        forward *= forward.absoluteValue
+        strafe *= strafe.absoluteValue
+        rotation *= rotation.absoluteValue
 
         // calculate translation vector (with magnitude of the max speed
         // volts divided by volts per meter per second is meters per second
@@ -68,8 +72,8 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
     }
 
     companion object {
-        private val kTranslationHand = GenericHID.Hand.kLeft
-        private val kRotHand = GenericHID.Hand.kRight
+        private val kTranslationHand = GenericHID.Hand.kRight
+        private val kRotHand = GenericHID.Hand.kLeft
         val xSource by lazy { Controls.driverFalconXbox.getY(kTranslationHand).withDeadband(0.1) }
         val zSource by lazy { Controls.driverFalconXbox.getX(kTranslationHand).withDeadband(0.1) }
         val rotSource by lazy { Controls.driverFalconXbox.getX(kRotHand).withDeadband(0.06) }

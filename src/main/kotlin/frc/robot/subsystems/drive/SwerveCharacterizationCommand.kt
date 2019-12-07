@@ -13,6 +13,8 @@ class SwerveCharacterizationCommand : FalconCommand(DriveSubsystem) {
     private val autoSpeedEntry = NetworkTableInstance.getDefault().getEntry("/robot/autospeed")
     private val telemetryEntry = NetworkTableInstance.getDefault().getEntry("/robot/telemetry")
 
+    override fun runsWhenDisabled() = true
+
     private var priorAutoSpeed = 0.0
 
     override fun execute() {

@@ -100,6 +100,10 @@ object DriveSubsystem : FalconSubsystem() {
         }
     }
 
+    fun setGyroAngle(angle: Rotation2d) {
+        odometry.resetPosition(Pose2d(periodicIO.pose.translation, angle), gyro())
+    }
+
     val currentSwerveModuleStates get() = listOf(flModule.state, frModule.state, blModule.state, brModule.state)
 
     val robotPosition get() = periodicIO.pose

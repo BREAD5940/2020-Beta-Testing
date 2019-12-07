@@ -102,15 +102,16 @@ open class Mk2SwerveModule(
                 driveMotor.setNeutral()
             }
             is Output.Percent -> {
-                println("setting duty cycle ${customizedOutput.percent}")
+//                println("setting duty cycle ${customizedOutput.percent}")
                 driveMotor.setDutyCycle(customizedOutput.percent)
             }
             is Output.Voltage -> {
                 driveMotor.setVoltage(customizedOutput.voltage)
             }
-//            is Output.Velocity -> {
+            is Output.Velocity -> {
 //                driveMotor.setVelocity(customizedOutput.velocity, customizedOutput.arbitraryFeedForward)
-//            }
+                driveMotor.setVoltage(customizedOutput.arbitraryFeedForward)
+            }
         }
     }
 

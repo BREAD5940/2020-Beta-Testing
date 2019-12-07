@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.kinematics.SwerveModuleState
 import edu.wpi.first.wpilibj.trajectory.Trajectory
 import frc.robot.subsystems.drive.SwerveDriveOutput
 import frc.robot.subsystems.drive.toTranslation2d
+import lib.normalize
 import org.ghrobotics.lib.mathematics.units.Meter
 import org.ghrobotics.lib.mathematics.units.SIUnit
 import org.ghrobotics.lib.physics.MotorCharacterization
@@ -37,13 +38,13 @@ class SwerveTrajectoryController(
         if (lastTime < 0.0) lastTime = time
         val dt = time - lastTime
 
-        // Our wanted position on the field
-        val velocity = state.poseMeters.rotation.toTranslation2d() * state.velocityMetersPerSecond
+        // Our wanted velocity on the field
+        val velocity = state.poseMeters.rotation.toTranslation2d().normalize() * state.velocityMetersPerSecond
 
         // P loop to convert delta in X and Y to velocity outputs, and rotation to rotations speed
-        forwardController.setSetpoint(state.poseMeters.translation.x)
-        strafeController.setSetpoint(state.poseMeters.translation.y)
-        rotationController.setSetpoint(targetHeading.radians)
+        forwardController.setpoint = state.poseMeters.translation.x
+        strafeController.setpoint = state.poseMeters.translation.y
+        rotationController.setpoint = targetHeading.radians
 
         // place the output in the robot frame of reference
         // and add the trajectory velocity to it as a feedforward
