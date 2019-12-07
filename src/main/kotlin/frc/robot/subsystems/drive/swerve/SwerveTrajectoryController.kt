@@ -42,16 +42,16 @@ class SwerveTrajectoryController(
         val velocity = state.poseMeters.rotation.toTranslation2d().normalize() * state.velocityMetersPerSecond
 
         // P loop to convert delta in X and Y to velocity outputs, and rotation to rotations speed
-        forwardController.setpoint = state.poseMeters.translation.x
-        strafeController.setpoint = state.poseMeters.translation.y
-        rotationController.setpoint = targetHeading.radians
+//        forwardController.setpoint = state.poseMeters.translation.x
+//        strafeController.setpoint = state.poseMeters.translation.y
+//        rotationController.setpoint = targetHeading.radians
 
         // place the output in the robot frame of reference
         // and add the trajectory velocity to it as a feedforward
         val feedbackOutput = ChassisSpeeds.fromFieldRelativeSpeeds(
-                forwardController.calculate(currentPose.translation.x, dt) + velocity.x,
-                strafeController.calculate(currentPose.translation.y, dt) + velocity.y,
-                rotationController.calculate(currentPose.rotation.radians, dt),
+                forwardController.calculate(currentPose.translation.x, state.poseMeters.translation.x) + velocity.x,
+                strafeController.calculate(currentPose.translation.y, state.poseMeters.translation.y) + velocity.y,
+                rotationController.calculate(currentPose.rotation.radians, targetHeading.radians),
                 currentPose.rotation
         )
 
