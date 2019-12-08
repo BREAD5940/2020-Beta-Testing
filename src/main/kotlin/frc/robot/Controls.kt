@@ -29,10 +29,10 @@ object Controls {
         button(kStart).changeOn(rezeroCommand)
 
         val trajectory = FalconTrajectoryGenerator.generateTrajectory(
-                listOf(Pose2d(10.feet, 10.feet, 0.degrees), Pose2d( 15.feet, 10.feet, 0.degrees)),
-                FalconTrajectoryConfig(1.feet.velocity, 3.feet.acceleration)
+                listOf(Pose2d(10.feet, 10.feet, 0.degrees), Pose2d( 20.feet, 5.feet, 0.degrees)),
+                FalconTrajectoryConfig(4.feet.velocity, 5.feet.acceleration)
         )
-        val command = SwerveTrajectoryFollowerCommand(trajectory, 0.degrees.toRotation2d())
+        val command = SwerveTrajectoryFollowerCommand(trajectory, 90.degrees.toRotation2d())
 
         button(kA).changeOn(SwerveCharacterizationCommand())
         button(kB).changeOn(command.beforeStarting(Runnable{
