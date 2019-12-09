@@ -32,7 +32,7 @@ object Controls {
             button(kB).changeOn { Intake.cargoOutake() }.changeOff { Intake.stop() }
             button(kX).changeOn { Intake.hatchIntake() }.changeOff { Intake.stop() }
             button(kY).changeOn { Intake.hatchIntake() }.changeOff { Intake.stop() }
-            //Presets TODO map controls for presets (elevator side done-ish)
+            //Presets TODO map controls for presets (elevator, wrist, proximal side done (still needs to be checked))
             button(kA).changeOn { ElevatorPresets.elevatorGoToPreset(height = 10.inches); Wrist.wristPreset(WristRadian = 0.4.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.6.radians) }.changeOff { ElevatorPresets.elevatorGoToPreset(height = 0.inches) }
             button(kB).changeOn { ElevatorPresets.elevatorGoToPreset(height = 10.inches); Wrist.wristPreset(WristRadian = 0.4.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.6.radians) }.changeOff { ElevatorPresets.elevatorGoToPreset(height = 0.inches) }
             button(kX).changeOn { ElevatorPresets.elevatorGoToPreset(height = 20.inches); Wrist.wristPreset(WristRadian = 0.4.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.6.radians) }.changeOff { ElevatorPresets.elevatorGoToPreset(height = 0.inches) }

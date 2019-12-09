@@ -12,7 +12,7 @@ import org.ghrobotics.lib.motors.ctre.FalconSRX
 import org.ghrobotics.lib.motors.ctre.falconSRX
 
 object Proximal : FalconSubsystem(){
-
+                //TODO check no motors are fighting
         val ProximalMaster: FalconSRX<Radian> = falconSRX(31, NativeUnitRotationModel(4096.nativeUnits * 8)) {
             //low gear = slow high gear = fast
             //TODO PUd pid now u noob
