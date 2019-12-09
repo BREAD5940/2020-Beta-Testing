@@ -39,6 +39,7 @@ class wristPreset(val WristRadian : SIUnit <Radian>){
     fun isFinished(){
 
        if(wristMotor.encoder.position -WristRadian < 0.09.radians){
+           //check the return function (I think I messed it up) TODO check return
            return isFinished()
        }
        else{

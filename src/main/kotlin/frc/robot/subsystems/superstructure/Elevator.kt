@@ -48,7 +48,7 @@ object Elevator : FalconSubsystem() {
         Follower1.follow(master)
         Follower1.talonSRX.setInverted(InvertType.OpposeMaster)
         Follower2.follow(master)
-        Follower3
+        Follower3.follow(master)
         master.talonSRX.configFactoryDefault()
         master.feedbackSensor = FeedbackDevice.CTRE_MagEncoder_Relative
         with(master.talonSRX) {
