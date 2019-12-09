@@ -33,12 +33,19 @@ object Controls {
             button(kX).changeOn { Intake.hatchIntake() }.changeOff { Intake.stop() }
             button(kY).changeOn { Intake.hatchIntake() }.changeOff { Intake.stop() }
             //Presets TODO map controls for presets (elevator, wrist, proximal side done (still needs to be checked))
-            button(kA).changeOn { ElevatorPresets.elevatorGoToPreset(height = 10.inches); Wrist.wristPreset(WristRadian = 0.4.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.6.radians) }.changeOff { ElevatorPresets.elevatorGoToPreset(height = 0.inches) }
-            button(kB).changeOn { ElevatorPresets.elevatorGoToPreset(height = 10.inches); Wrist.wristPreset(WristRadian = 0.4.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.6.radians) }.changeOff { ElevatorPresets.elevatorGoToPreset(height = 0.inches) }
-            button(kX).changeOn { ElevatorPresets.elevatorGoToPreset(height = 20.inches); Wrist.wristPreset(WristRadian = 0.4.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.6.radians) }.changeOff { ElevatorPresets.elevatorGoToPreset(height = 0.inches) }
-            button(kY).changeOn { ElevatorPresets.elevatorGoToPreset(height = 20.inches); Wrist.wristPreset(WristRadian = 0.4.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.6.radians) }.changeOff { ElevatorPresets.elevatorGoToPreset(height = 0.inches) }
-            button(kA).changeOn { ElevatorPresets.elevatorGoToPreset(height = 30.inches); Wrist.wristPreset(WristRadian = 0.4.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.6.radians) }.changeOff { ElevatorPresets.elevatorGoToPreset(height = 0.inches) }
-            button(kB).changeOn { ElevatorPresets.elevatorGoToPreset(height = 30.inches); Wrist.wristPreset(WristRadian = 0.4.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.6.radians) }.changeOff { ElevatorPresets.elevatorGoToPreset(height = 0.inches) }
+            //top line is on press and bottom is when you let go of the button
+            button(kA).changeOn { ElevatorPresets.elevatorGoToPreset(height = 10.inches) ; Wrist.wristPreset(WristRadian = 0.4.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.6.radians) }.changeOff {
+                ElevatorPresets.elevatorGoToPreset(height = 0.inches) ; Wrist.wristPreset(WristRadian = 0.0.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.0.radians) }
+            button(kB).changeOn { ElevatorPresets.elevatorGoToPreset(height = 10.inches) ; Wrist.wristPreset(WristRadian = 0.4.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.6.radians) }.changeOff {
+                ElevatorPresets.elevatorGoToPreset(height = 0.inches) ; Wrist.wristPreset(WristRadian = 0.0.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.0.radians) }
+            button(kX).changeOn { ElevatorPresets.elevatorGoToPreset(height = 20.inches) ; Wrist.wristPreset(WristRadian = 0.4.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.6.radians) }.changeOff {
+                ElevatorPresets.elevatorGoToPreset(height = 0.inches) ; Wrist.wristPreset(WristRadian = 0.0.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.0.radians) }
+            button(kY).changeOn { ElevatorPresets.elevatorGoToPreset(height = 20.inches) ; Wrist.wristPreset(WristRadian = 0.4.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.6.radians) }.changeOff {
+                ElevatorPresets.elevatorGoToPreset(height = 0.inches) ; Wrist.wristPreset(WristRadian = 0.0.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.0.radians) }
+            button(kA).changeOn { ElevatorPresets.elevatorGoToPreset(height = 30.inches) ; Wrist.wristPreset(WristRadian = 0.4.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.6.radians) }.changeOff {
+                ElevatorPresets.elevatorGoToPreset(height = 0.inches) ; Wrist.wristPreset(WristRadian = 0.0.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.0.radians) }
+            button(kB).changeOn { ElevatorPresets.elevatorGoToPreset(height = 30.inches) ; Wrist.wristPreset(WristRadian = 0.4.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.6.radians) }.changeOff {
+                ElevatorPresets.elevatorGoToPreset(height = 0.inches) ; Wrist.wristPreset(WristRadian = 0.0.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.0.radians) }
 
 
         }
@@ -55,4 +62,7 @@ object Controls {
     }
 
     private fun Command.andThen(block: () -> Unit) = sequential { +this@andThen; +InstantCommand(Runnable(block)) }
+    fun update() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }
