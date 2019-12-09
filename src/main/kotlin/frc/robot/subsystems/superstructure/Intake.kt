@@ -6,16 +6,14 @@ import org.ghrobotics.lib.motors.ctre.FalconSRX
 import org.ghrobotics.lib.wrappers.FalconDoubleSolenoid
 import org.ghrobotics.lib.wrappers.FalconSolenoid
 
-val hatchMotor = FalconSRX(51, DefaultNativeUnitModel)
-val cargoMotor = FalconSRX(50, DefaultNativeUnitModel)
-var cargo = false
 object Intake : FalconSubsystem() {
 
+    var cargo = false
     val hatchMotor = FalconSRX(51, DefaultNativeUnitModel)
     val cargoMotor = FalconSRX(50, DefaultNativeUnitModel)
     val solenoid = FalconDoubleSolenoid(0,1, 8)
 
-
+        //No u, from gru
 
 
     fun cargoIntake() {
@@ -62,13 +60,5 @@ object Intake : FalconSubsystem() {
         }
     }
 
-
-
-
-
-
-
-
 }
 
-//TODO my code yetus deletused and now there is no code, i re write
