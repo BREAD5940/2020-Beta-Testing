@@ -3,3 +3,5 @@ package frc.robot.subsystems.superstructure
 import org.ghrobotics.lib.commands.FalconSubsystem
 
 object Superstructure : FalconSubsystem()
+
+//TODO make the presets in here
