@@ -9,19 +9,12 @@ import org.ghrobotics.lib.mathematics.units.SIUnit
 object ElevatorPresets {
     class elevatorGoToPreset(val height : SIUnit <Meter>) : FalconCommand(Elevator) {
         //TODO Change to real presets
-
         override fun initialize() {
             super.initialize()
             Elevator.master.setPosition(height)
         }
         override fun isFinished(): Boolean {
-
-            return (Elevator.master.encoder.position -10.inches).absoluteValue < 0.5.inches
-
+            return (Elevator.master.encoder.position -height).absoluteValue < 0.5.inches
         }
-
-
-
-
     }
 }

@@ -2,4 +2,8 @@ package frc.robot.subsystems.superstructure
 
 import org.ghrobotics.lib.commands.FalconSubsystem
 
-object Proximal : FalconSubsystem()
+object Proximal : FalconSubsystem(){
+
+
+
+}
