@@ -20,6 +20,7 @@ object Elevator : FalconSubsystem() {
 
     private val shifter = FalconDoubleSolenoid(2, 3, 8)
     val lowGear = true
+
     val master: FalconSRX<Meter> = falconSRX(21, NativeUnitLengthModel(4096.nativeUnits, 0.75.inches)) {
         //low gear = slow high gear = fast
         //TODO PUd pid now u noob
@@ -64,5 +65,6 @@ object Elevator : FalconSubsystem() {
         shifter.state = FalconSolenoid.State.Reverse
         master.talonSRX.selectProfileSlot(1, 0)
     }
+
 
 }
