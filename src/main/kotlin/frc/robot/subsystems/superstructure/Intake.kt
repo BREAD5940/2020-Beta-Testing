@@ -7,42 +7,42 @@ import org.ghrobotics.lib.wrappers.FalconDoubleSolenoid
 import org.ghrobotics.lib.wrappers.FalconSolenoid
 
 
-var cargo = false
+
 object Intake : FalconSubsystem() {
     val hatchMotor = FalconSRX(51, DefaultNativeUnitModel)
     val cargoMotor = FalconSRX(50, DefaultNativeUnitModel)
+    var cargo = false
     val solenoid = FalconDoubleSolenoid(0,1, 8)
 
-        //No u, from gru
-
+    init{
+        hatchMotor.talonSRX.configFactoryDefault()
+        cargoMotor.talonSRX.configFactoryDefault()
+        }
 
     fun cargoIntake() {
-        cargoMotor.talonSRX.configPeakOutputForward(0.8)
-        hatchMotor.talonSRX.configPeakOutputForward(0.8)
+        cargoMotor.setDutyCycle(1.0)
+        hatchMotor.setDutyCycle(1.0)
         solenoid.state = FalconSolenoid.State.Forward
     }
     fun hatchIntake() {
-        hatchMotor.talonSRX.configPeakOutputForward(0.8)
+        hatchMotor.setDutyCycle(1.0)
         solenoid.state = FalconSolenoid.State.Reverse
-
     }
     fun cargoOutake() {
-        cargoMotor.talonSRX.configPeakOutputForward(-0.8)
-        hatchMotor.talonSRX.configPeakOutputForward(-0.8)
+        //I made the motors only yeet insted of adjust because we only really yeet them
+        cargoMotor.setDutyCycle(-1.0)
+        hatchMotor.setDutyCycle(-1.0)
         solenoid.state = FalconSolenoid.State.Reverse
-
     }
     fun hatchOutake() {
-        hatchMotor.talonSRX.configPeakOutputForward(-0.8)
+        hatchMotor.setDutyCycle(-1.0)
         solenoid.state = FalconSolenoid.State.Reverse
-
     }
     fun stop() {
         cargoMotor.setNeutral()
         hatchMotor.setNeutral()
         solenoid.state = FalconSolenoid.State.Reverse
     }
-
     fun intake() {
         if (cargo){
             cargoIntake()
@@ -59,6 +59,5 @@ object Intake : FalconSubsystem() {
             hatchOutake()
         }
     }
-
 }
 
