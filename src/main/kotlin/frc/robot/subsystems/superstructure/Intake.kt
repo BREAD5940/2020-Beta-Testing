@@ -6,9 +6,9 @@ import org.ghrobotics.lib.motors.ctre.FalconSRX
 import org.ghrobotics.lib.wrappers.FalconDoubleSolenoid
 import org.ghrobotics.lib.wrappers.FalconSolenoid
 
-object Intake : FalconSubsystem() {
 
-    var cargo = false
+var cargo = false
+object Intake : FalconSubsystem() {
     val hatchMotor = FalconSRX(51, DefaultNativeUnitModel)
     val cargoMotor = FalconSRX(50, DefaultNativeUnitModel)
     val solenoid = FalconDoubleSolenoid(0,1, 8)

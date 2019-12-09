@@ -1,35 +1,27 @@
 package frc.robot.subsystems.superstructure
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.mathematics.units.inches
-class ElevatorPresets : FalconCommand(Elevator) {
+import org.ghrobotics.lib.mathematics.units.nativeunit.DefaultNativeUnitModel
+import frc.robot.subsystems.superstructure.ElevatorPresets
+import org.ghrobotics.lib.mathematics.units.Meter
+import org.ghrobotics.lib.mathematics.units.SIUnit
+
+object ElevatorPresets {
+    class elevatorGoToPreset(val height : SIUnit <Meter>) : FalconCommand(Elevator) {
         //TODO Change to real presets
-class Hatch {
-        fun low() {
-            Elevator.master.setPosition(10.inches)
+
+        override fun initialize() {
+            super.initialize()
+            Elevator.master.setPosition(height)
         }
-        fun mid() {
-            Elevator.master.setPosition(20.inches)
+        override fun isFinished(): Boolean {
+
+            return (Elevator.master.encoder.position -10.inches).absoluteValue < 0.5.inches
+
         }
-        fun high() {
-            Elevator.master.setPosition(30.inches)
-        }
-}
- class Cargo {
-
-     fun low() {
-         Elevator.master.setPosition(11.inches)
-     }
-     fun mid() {
-         Elevator.master.setPosition(22.inches)
-     }
-     fun high() {
-         Elevator.master.setPosition(33.inches)
-     }
-     fun zero() {
-         Elevator.master.setPosition(0.inches)
-     }
- }
 
 
 
+
+    }
 }
