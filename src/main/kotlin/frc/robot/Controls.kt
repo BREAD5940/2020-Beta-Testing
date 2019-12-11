@@ -18,7 +18,9 @@ import org.ghrobotics.lib.wrappers.hid.*
 import frc.robot.subsystems.superstructure.Elevator as Elevator1
 
 object Controls {
-    class XboxController : FalconCommand(Elevator1){
+    class XboxController {
+
+
 
         val driverControllerLowLevel = XboxController(0)
         val driverFalconXbox = driverControllerLowLevel.mapControls {
@@ -27,42 +29,41 @@ object Controls {
             // button(kB).changeOn(DriveSubsystem.followTrajectory(TestTrajectory.trajectory)).changeOn {
             // DriveSubsystem.odometry.resetPosition(TestTrajectory.trajectory.states[0].poseMeters)
             //}
-//TODO finish all button layouts and follow previos project.
-            button(kA).changeOn { Intake.cargoIntake() }.changeOff { Intake.stop() }
-            button(kB).changeOn { Intake.cargoOutake() }.changeOff { Intake.stop() }
-            button(kX).changeOn { Intake.hatchIntake() }.changeOff { Intake.stop() }
-            button(kY).changeOn { Intake.hatchIntake() }.changeOff { Intake.stop() }
-            //Presets TODO map controls for presets (elevator, wrist, proximal side done (still needs to be checked))
+
+            //TODO finish all button layouts and follow previos project.
             //top line is on press and bottom is when you let go of the button
-            button(kA).changeOn { ElevatorPresets.elevatorGoToPreset(height = 10.inches) ; Wrist.wristPreset(WristRadian = 0.4.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.6.radians) }.changeOff {
-                ElevatorPresets.elevatorGoToPreset(height = 0.inches) ; Wrist.wristPreset(WristRadian = 0.0.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.0.radians) }
-            button(kB).changeOn { ElevatorPresets.elevatorGoToPreset(height = 10.inches) ; Wrist.wristPreset(WristRadian = 0.4.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.6.radians) }.changeOff {
-                ElevatorPresets.elevatorGoToPreset(height = 0.inches) ; Wrist.wristPreset(WristRadian = 0.0.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.0.radians) }
-            button(kX).changeOn { ElevatorPresets.elevatorGoToPreset(height = 20.inches) ; Wrist.wristPreset(WristRadian = 0.4.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.6.radians) }.changeOff {
-                ElevatorPresets.elevatorGoToPreset(height = 0.inches) ; Wrist.wristPreset(WristRadian = 0.0.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.0.radians) }
-            button(kY).changeOn { ElevatorPresets.elevatorGoToPreset(height = 20.inches) ; Wrist.wristPreset(WristRadian = 0.4.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.6.radians) }.changeOff {
-                ElevatorPresets.elevatorGoToPreset(height = 0.inches) ; Wrist.wristPreset(WristRadian = 0.0.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.0.radians) }
-            button(kA).changeOn { ElevatorPresets.elevatorGoToPreset(height = 30.inches) ; Wrist.wristPreset(WristRadian = 0.4.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.6.radians) }.changeOff {
-                ElevatorPresets.elevatorGoToPreset(height = 0.inches) ; Wrist.wristPreset(WristRadian = 0.0.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.0.radians) }
-            button(kB).changeOn { ElevatorPresets.elevatorGoToPreset(height = 30.inches) ; Wrist.wristPreset(WristRadian = 0.4.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.6.radians) }.changeOff {
-                ElevatorPresets.elevatorGoToPreset(height = 0.inches) ; Wrist.wristPreset(WristRadian = 0.0.radians) ; Proximal.ProximalPreset(ProximalRadian = 0.0.radians) }
+            state({ driverControllerLowLevel.getRawButton(10) }) {
+                button(kA).changeOn { ArmPresets.cargoLow() }
+                button(kB).changeOn { ArmPresets.cargoMid() }
+                button(kX).changeOn { ArmPresets.cargoHigh() }
+                button(kA).changeOn { Intake.cargoIntake() }.changeOff { Intake.stop() }
+                button(kB).changeOn { Intake.cargoOutake() }.changeOff { Intake.stop() }
+            }
+            state({ !driverControllerLowLevel.getRawButton(10) }) {
+                button(kY).changeOn { ArmPresets.hatchLow() }
+                button(kX).changeOn { ArmPresets.hatchMid() }
+                button(kY).changeOn { ArmPresets.hatchHigh() }
+                button(kX).changeOn { Intake.hatchIntake() }.changeOff { Intake.stop() }
+                button(kY).changeOn { Intake.hatchIntake() }.changeOff { Intake.stop() }
+            }
 
 
+            val operatorWPIJoystick = XboxController(1)
+            val operatorFalconXbox = operatorWPIJoystick.mapControls {
+            }
+
+              
+            fun update() {
+
+                driverFalconXbox.update()
+     //  operatorFalconHID.update()
+                operatorFalconXbox.update()
+            }
         }
 
-        val operatorWPIJoystick = XboxController(1)
-        val operatorFalconXbox = operatorWPIJoystick.mapControls {
-        }
-
+        private fun Command.andThen(block: () -> Unit) = sequential { +this@andThen; +InstantCommand(Runnable(block)) }
         fun update() {
-            driverFalconXbox.update()
-//        operatorFalconHID.update()
-            operatorFalconXbox.update()
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
-    }
-
-    private fun Command.andThen(block: () -> Unit) = sequential { +this@andThen; +InstantCommand(Runnable(block)) }
-    fun update() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }
