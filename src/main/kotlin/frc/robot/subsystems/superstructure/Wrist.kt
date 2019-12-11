@@ -1,4 +1,5 @@
 package frc.robot.subsystems.superstructure
+import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.SIUnit
 import org.ghrobotics.lib.mathematics.units.derived.Radian
@@ -19,12 +20,12 @@ val wristMotor: FalconSRX<Radian> = falconSRX(33, NativeUnitRotationModel(4096.n
     talonSRX.config_kD(0, 0.1)
 }
 //radian to degree is ~180(3.14)
-class wristPreset(val WristAngle : SIUnit <Radian>){
+class wristPreset(val WristAngle : SIUnit <Radian>) : FalconCommand(Wrist){
    // val wantedWristRadian = 0
- fun initalize() {
+   fun initalize() {
     wristMotor.setPosition(WristAngle)
 }
-    fun isFinished(): Boolean {
+    override fun isFinished(): Boolean {
         return (wristMotor.encoder.position -WristAngle).absoluteValue < 5.degrees
     }
 

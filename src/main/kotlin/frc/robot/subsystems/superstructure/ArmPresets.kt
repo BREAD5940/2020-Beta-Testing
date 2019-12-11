@@ -1,4 +1,6 @@
 package frc.robot.subsystems.superstructure
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
+import org.ghrobotics.lib.commands.sequential
 import org.ghrobotics.lib.mathematics.units.derived.degrees
 import org.ghrobotics.lib.mathematics.units.inches
 
@@ -9,19 +11,20 @@ object ArmPresets {
         fun cargoLow(){
                 //todo Make elavator make the proximal not hit and find "0"
             //ElevatorPresets.elevatorGoToPreset(height = 30.inches)
-            Proximal.ProximalPreset(ProximalAngle = 90.degrees)
-            Wrist.wristPreset(WristAngle = 10.degrees)
-            ElevatorPresets.elevatorGoToPreset(height = 5.inches)
+            SequentialCommandGroup(Proximal.ProximalPreset(ProximalAngle = 90.degrees),
+            Wrist.wristPreset(WristAngle = 10.degrees),
+            ElevatorPresets.elevatorGoToPreset(height = 5.inches)).schedule()
         }
         fun cargoMid(){
 //todo Make elavator make the proximal not hit and find "0"
             //ElevatorPresets.elevatorGoToPreset(height = 30.inches)
-            Proximal.ProximalPreset(ProximalAngle = 90.degrees)
-            Wrist.wristPreset(WristAngle = 10.degrees)
-            ElevatorPresets.elevatorGoToPreset(height = 25.inches)
+            SequentialCommandGroup(Proximal.ProximalPreset(ProximalAngle = 90.degrees),
+            Wrist.wristPreset(WristAngle = 10.degrees),
+            ElevatorPresets.elevatorGoToPreset(height = 25.inches)).schedule()
         }
         fun cargoHigh(){
 //todo Make elavator make the proximal not hit and find "0"
+
             //ElevatorPresets.elevatorGoToPreset(height = 30.inches)
             Proximal.ProximalPreset(ProximalAngle = 90.degrees)
             Wrist.wristPreset(WristAngle = 10.degrees)

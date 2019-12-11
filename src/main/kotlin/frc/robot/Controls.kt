@@ -21,7 +21,6 @@ object Controls {
     class XboxController {
 
 
-
         val driverControllerLowLevel = XboxController(0)
         val driverFalconXbox = driverControllerLowLevel.mapControls {
 
@@ -46,17 +45,15 @@ object Controls {
                 button(kX).changeOn { Intake.hatchIntake() }.changeOff { Intake.stop() }
                 button(kY).changeOn { Intake.hatchIntake() }.changeOff { Intake.stop() }
             }
-
+        }
 
             val operatorWPIJoystick = XboxController(1)
             val operatorFalconXbox = operatorWPIJoystick.mapControls {
             }
 
-              
-            fun update() {
 
+            fun update() {
                 driverFalconXbox.update()
-     //  operatorFalconHID.update()
                 operatorFalconXbox.update()
             }
         }
@@ -66,4 +63,4 @@ object Controls {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
     }
-}
+

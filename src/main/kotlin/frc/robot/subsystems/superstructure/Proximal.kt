@@ -1,6 +1,7 @@
 package frc.robot.subsystems.superstructure
 
 import com.ctre.phoenix.motorcontrol.InvertType
+import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.SIUnit
 import org.ghrobotics.lib.mathematics.units.derived.Radian
@@ -29,14 +30,14 @@ object Proximal : FalconSubsystem(){
         proximalFolower.talonSRX.setInverted(InvertType.OpposeMaster)
     }
 
-        class ProximalPreset(val ProximalAngle : SIUnit<Radian>){
+        class ProximalPreset(val ProximalAngle : SIUnit<Radian>) : FalconCommand(Proximal){
             fun initalize() {
                 //inverting the master motor
                 ProximalMaster.setPosition(-ProximalAngle)
                 //followers
             }
 
-            fun isFinished(): Boolean {
+            override fun isFinished(): Boolean {
                 return (ProximalMaster.encoder.position -ProximalAngle).absoluteValue < 5.degrees
             }
         }
