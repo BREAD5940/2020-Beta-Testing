@@ -18,6 +18,8 @@ import org.ghrobotics.lib.wrappers.hid.*
 import frc.robot.subsystems.superstructure.Elevator as Elevator1
 
 object Controls {
+
+
     class XboxController {
 
 
@@ -33,18 +35,20 @@ object Controls {
             //top line is on press and bottom is when you let go of the button
             state({ driverControllerLowLevel.getRawButton(10) }) {
                 button(kA).changeOn { ArmPresets.cargoLow() }
-                button(kB).changeOn { ArmPresets.cargoMid() }
-                button(kX).changeOn { ArmPresets.cargoHigh() }
-                button(kA).changeOn { Intake.cargoIntake() }.changeOff { Intake.stop() }
-                button(kB).changeOn { Intake.cargoOutake() }.changeOff { Intake.stop() }
+                button(kX).changeOn { ArmPresets.cargoMid() }
+                button(kY).changeOn { ArmPresets.cargoHigh() }
+                button(kBumperLeft).changeOn { Intake.cargoIntake() }.changeOff { Intake.stop() }
+                button(kBumperRight).changeOn { Intake.cargoOutake() }.changeOff { Intake.stop() }
             }
             state({ !driverControllerLowLevel.getRawButton(10) }) {
-                button(kY).changeOn { ArmPresets.hatchLow() }
+                button(kA).changeOn { ArmPresets.hatchLow() }
                 button(kX).changeOn { ArmPresets.hatchMid() }
                 button(kY).changeOn { ArmPresets.hatchHigh() }
-                button(kX).changeOn { Intake.hatchIntake() }.changeOff { Intake.stop() }
-                button(kY).changeOn { Intake.hatchIntake() }.changeOff { Intake.stop() }
+                button(kBumperLeft).changeOn { Intake.hatchIntake() }.changeOff { Intake.stop() }
+                button(kBumperRight).changeOn { Intake.hatchIntake() }.changeOff { Intake.stop() }
             }
+            button(kB).changeOn { ArmPresets.stowed() }
+
         }
 
             val operatorWPIJoystick = XboxController(1)

@@ -23,8 +23,10 @@ class DriveCommand : FalconCommand(DriveSubsystem) {
     }
 
     companion object {
+        // this needs to be fixed
         private const val kDeadband = 0.05
-        val speedSource by lazy { Controls.driverFalconXbox.getY(GenericHID.Hand.kLeft).withDeadband(kDeadband) }
-        val rotationSource by lazy { Controls.driverFalconXbox.getX(GenericHID.Hand.kRight).withDeadband(kDeadband) }
-    }
+        //TODO check this bit I (max) think I fixed it
+        //val speedSource by lazy { Controls.driverFalconXbox.getY(GenericHID.Hand.kLeft).withDeadband(kDeadband) }
+        val speedSource by lazy { Controls.XboxController().driverFalconXbox.getY(GenericHID.Hand.kLeft).withDeadband(kDeadband) }
+        val rotationSource by lazy { Controls.XboxController().driverFalconXbox.getX(GenericHID.Hand.kRight).withDeadband(kDeadband) } }
 }
