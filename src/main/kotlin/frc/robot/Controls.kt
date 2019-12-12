@@ -11,6 +11,7 @@ import frc.robot.subsystems.superstructure.Elevator
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.commands.sequential
 import org.ghrobotics.lib.mathematics.units.derived.radians
+import org.ghrobotics.lib.mathematics.units.inch
 import org.ghrobotics.lib.mathematics.units.inches
 import org.ghrobotics.lib.wrappers.FalconDoubleSolenoid
 import org.ghrobotics.lib.wrappers.FalconSolenoid
@@ -48,6 +49,9 @@ object Controls {
                 button(kBumperRight).changeOn { Intake.hatchIntake() }.changeOff { Intake.stop() }
             }
             button(kB).changeOn { ArmPresets.stowed() }
+            pov(0).changeOn {ArmPresets.hab3Prep()}
+            pov(180).changeOn {ArmPresets.hab2Prep()}
+            pov(90).changeOn {ArmPresets.habYEET()}
 
         }
 
