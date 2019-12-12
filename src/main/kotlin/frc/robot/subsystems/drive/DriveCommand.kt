@@ -23,7 +23,7 @@ class DriveCommand : FalconCommand(DriveSubsystem) {
     }
 
     companion object {
-        // this needs to be fixed
+
         private const val kDeadband = 0.05
         //TODO check this bit I (max) think I fixed it
         //val speedSource by lazy { Controls.driverFalconXbox.getY(GenericHID.Hand.kLeft).withDeadband(kDeadband) }

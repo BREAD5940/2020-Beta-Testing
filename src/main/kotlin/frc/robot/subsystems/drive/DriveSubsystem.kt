@@ -7,12 +7,12 @@ import edu.wpi.first.wpilibj.geometry.Pose2d
 import edu.wpi.first.wpilibj.geometry.Rotation2d
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry
-import org.ghrobotics.lib.mathematics.units.Meter
-import org.ghrobotics.lib.mathematics.units.SIUnit
+import frc.robot.Vision
+import org.ghrobotics.lib.mathematics.units.*
+import org.ghrobotics.lib.mathematics.units.derived.degree
 import org.ghrobotics.lib.mathematics.units.derived.degrees
+import org.ghrobotics.lib.mathematics.units.derived.radian
 import org.ghrobotics.lib.mathematics.units.derived.toRotation2d
-import org.ghrobotics.lib.mathematics.units.inMeters
-import org.ghrobotics.lib.mathematics.units.inches
 import org.ghrobotics.lib.mathematics.units.nativeunit.NativeUnitLengthModel
 import org.ghrobotics.lib.mathematics.units.nativeunit.nativeUnits
 import org.ghrobotics.lib.motors.FalconMotor
@@ -22,9 +22,11 @@ import org.ghrobotics.lib.subsystems.drive.FalconWestCoastDrivetrain
 import org.ghrobotics.lib.utils.Source
 
 object DriveSubsystem : FalconWestCoastDrivetrain() {
+    lateinit var wantedAngle: Rotation2d
     override val controller = RamseteController(2.0,0.7)
     val gyro_ = AHRS(SPI.Port.kMXP)
     override val gyro = { (gyro_.yaw * -1).degrees.toRotation2d() }
+    val gyroAngle = gyro
     override val kinematics: DifferentialDriveKinematics = DifferentialDriveKinematics((26.0).inches.inMeters())
     override val leftCharacterization = MotorCharacterization<Meter>(SIUnit(2.66), SIUnit(0.918), SIUnit(1.49))
     public override val leftMotor = FalconSRX(id = 1, model = NativeUnitLengthModel(4096.nativeUnits, 2.inches)).apply { /* this: FalconSRX<NativeUnit> */
@@ -65,4 +67,35 @@ object DriveSubsystem : FalconWestCoastDrivetrain() {
         defaultCommand = DriveCommand()
     }
 
+    class GoToGyroAngle(){
+        //TODO tune the pids
+        val kP = 0.9
+        val kD = 4.95
+
+        val error = (DriveSubsystem.gyro() - wantedAngle).radians
+             //lateinit var wantedAngle: Rotation2d
+                  var prevError = 0.0
+
+        fun initalize(){
+            wantedAngle = DriveSubsystem.gyro() + (-(Vision.getUpdate())).degrees.toRotation2d()
+        }
+        fun execute(){
+            val der = (error - prevError) * kD
+            val output = error * kP + der
+
+            DriveSubsystem.leftMotor.setDutyCycle(-output)
+            DriveSubsystem.rightMotor.setDutyCycle(output)
+
+            prevError = error
+        }
+
+
+
+
+        fun isfinished() : Boolean{
+            return error < 5 //5 degrees error
+        }
+
+
+    }
 }
