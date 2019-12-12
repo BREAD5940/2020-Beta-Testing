@@ -26,11 +26,11 @@ object Controls {
         val driverControllerLowLevel = XboxController(0)
         val driverFalconXbox = driverControllerLowLevel.mapControls {
 
-            //button(kX).changeOn(InstantCommand(Runnable { "Hullo!" }))
+
             // button(kB).changeOn(DriveSubsystem.followTrajectory(TestTrajectory.trajectory)).changeOn {
             // DriveSubsystem.odometry.resetPosition(TestTrajectory.trajectory.states[0].poseMeters)
             //}
-
+                //^^^ USE semi colin or comma to shorten ^^^
             //TODO finish all button layouts and follow previos project.
             //top line is on press and bottom is when you let go of the button
             state({ driverControllerLowLevel.getRawButton(10) }) {
