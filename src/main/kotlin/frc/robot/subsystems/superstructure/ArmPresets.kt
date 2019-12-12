@@ -51,12 +51,12 @@ object ArmPresets {
         }
         fun habYEET(){
             if(hab3) {
-                ClimbSubsystem.habClimberStilt.setPosition(20.inches) //change to actual height
-                Superstructure.goToPreset(10.inches, (-5).degrees, 93.degrees, 0.0.inches) //good angle bad height
+                //ClimbSubsystem.habClimberStilt.setPosition(20.inches) //change to actual height
+                Superstructure.goToPreset(10.inches, (-5).degrees, 93.degrees, 20.0.inches) //good angle bad height
             }
             if(hab2) {
-                ClimbSubsystem.habClimberStilt.setPosition(20.inches) //change to actual height
-                Superstructure.goToPreset(8.inches, (-5).degrees, 93.degrees, 0.0.inches) // good angle bad height
+               // ClimbSubsystem.habClimberStilt.setPosition(20.inches) //change to actual height
+                Superstructure.goToPreset(8.inches, (-5).degrees, 93.degrees, 10.0.inches) // good angle bad height
             }
         }
 
