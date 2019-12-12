@@ -77,7 +77,8 @@ object DriveSubsystem : FalconWestCoastDrivetrain() {
                   var prevError = 0.0
 
         fun initalize(){
-            wantedAngle = DriveSubsystem.gyro() + (-(Vision.getUpdate())).degrees.toRotation2d()
+            //TODO ALSO FIX
+            wantedAngle = DriveSubsystem.gyro() + (Vision.angle).degree.toRotation2d()
         }
         fun execute(){
             val der = (error - prevError) * kD
