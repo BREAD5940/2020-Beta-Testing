@@ -2,6 +2,7 @@ package frc.robot
 import edu.wpi.first.wpilibj.XboxController
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.InstantCommand
+import frc.robot.subsystems.climb.ClimbSubsystem
 import frc.robot.subsystems.drive.DriveSubsystem
 import frc.robot.subsystems.drive.TestTrajectory
 import frc.robot.subsystems.superstructure.*
@@ -38,20 +39,33 @@ object Controls {
                 button(kA).changeOn { ArmPresets.cargoLow() }
                 button(kX).changeOn { ArmPresets.cargoMid() }
                 button(kY).changeOn { ArmPresets.cargoHigh() }
-                button(kBumperLeft).changeOn { Intake.cargoIntake() }.changeOff { Intake.stop() }
-                button(kBumperRight).changeOn { Intake.cargoOutake() }.changeOff { Intake.stop() }
+                if(ArmPresets.hab3 or ArmPresets.hab2){
+                    button(kBumperLeft).changeOn { ClimbSubsystem.intakeWheels.setDutyCycle(1.0) }.changeOff { ClimbSubsystem.intakeWheels.setNeutral() }
+                    button(kBumperRight).changeOn { ClimbSubsystem.intakeWheels.setDutyCycle(1.0) }.changeOff { ClimbSubsystem.intakeWheels.setNeutral() }
+                }
+                else {
+                    button(kBumperLeft).changeOn { Intake.cargoIntake() }.changeOff { Intake.stop() }
+                    button(kBumperRight).changeOn { Intake.cargoOutake() }.changeOff { Intake.stop() }
+                }
             }
             state({ !driverControllerLowLevel.getRawButton(10) }) {
                 button(kA).changeOn { ArmPresets.hatchLow() }
                 button(kX).changeOn { ArmPresets.hatchMid() }
                 button(kY).changeOn { ArmPresets.hatchHigh() }
-                button(kBumperLeft).changeOn { Intake.hatchIntake() }.changeOff { Intake.stop() }
-                button(kBumperRight).changeOn { Intake.hatchIntake() }.changeOff { Intake.stop() }
+                if(ArmPresets.hab3 or ArmPresets.hab2){
+                    button(kBumperLeft).changeOn { ClimbSubsystem.intakeWheels.setDutyCycle(-1.0) }.changeOff { ClimbSubsystem.intakeWheels.setNeutral() }
+                    button(kBumperRight).changeOn { ClimbSubsystem.intakeWheels.setDutyCycle(-1.0) }.changeOff { ClimbSubsystem.intakeWheels.setNeutral() }
+                }
+                else {
+                    button(kBumperLeft).changeOn { Intake.hatchIntake() }.changeOff { Intake.stop() }
+                    button(kBumperRight).changeOn { Intake.hatchIntake() }.changeOff { Intake.stop() }
+                }
             }
             button(kB).changeOn { ArmPresets.stowed() }
-            pov(0).changeOn {ArmPresets.hab3Prep()}
-            pov(180).changeOn {ArmPresets.hab2Prep()}
-            pov(90).changeOn {ArmPresets.habYEET()}
+            pov(90).changeOn {ArmPresets.hab3Prep()}
+            pov(270).changeOn {ArmPresets.hab2Prep()}
+            pov(0).changeOn {ArmPresets.habYEET()}
+            pov(180).changeOn {ArmPresets.noHab()}
 
         }
 

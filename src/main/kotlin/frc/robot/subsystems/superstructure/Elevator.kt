@@ -42,8 +42,6 @@ object Elevator : FalconSubsystem() {
     val Follower3 = FalconSRX(24, DefaultNativeUnitModel)
 
     override fun lateInit() {
-
-
         //when being small brain then look here
         Follower1.follow(master)
         Follower1.talonSRX.setInverted(InvertType.OpposeMaster)
@@ -51,9 +49,6 @@ object Elevator : FalconSubsystem() {
         Follower3.follow(master)
         master.talonSRX.configFactoryDefault()
         master.feedbackSensor = FeedbackDevice.CTRE_MagEncoder_Relative
-        with(master.talonSRX) {
-
-        }
     }
 
     fun setLowGear() {

@@ -30,15 +30,15 @@ object Proximal : FalconSubsystem(){
         proximalFolower.talonSRX.setInverted(InvertType.OpposeMaster)
     }
 
-        class ProximalPreset(val ProximalAngle : SIUnit<Radian>) : FalconCommand(Proximal){
+        class ProximalPreset(val proximalAngle : SIUnit<Radian>) : FalconCommand(Proximal){
             fun initalize() {
                 //inverting the master motor
-                ProximalMaster.setPosition(-ProximalAngle)
+                ProximalMaster.setPosition(-proximalAngle)
                 //followers
             }
 
             override fun isFinished(): Boolean {
-                return (ProximalMaster.encoder.position -ProximalAngle).absoluteValue < 5.degrees
+                return (ProximalMaster.encoder.position -proximalAngle).absoluteValue < 5.degrees
             }
         }
     }
