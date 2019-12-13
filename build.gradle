@@ -10,7 +10,7 @@ buildscript {
 
 plugins {
     id "java"
-    id "edu.wpi.first.GradleRIO" version "2020.1.1-beta-2"
+    id "edu.wpi.first.GradleRIO" version "2020.1.1-beta-3"
     id "org.jetbrains.kotlin.jvm" version "1.3.50"
     id "idea"
     id "org.jlleitschuh.gradle.ktlint" version "9.0.0"
@@ -20,6 +20,9 @@ sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
 def ROBOT_MAIN_CLASS = "frc.robot.RobotKt"
+
+wpi.maven.useFrcMavenLocalDevelopment = true
+wpi.wpilibVersion = '2020.424242.+'
 
 sourceSets {
     main.kotlin.srcDirs += 'src/generated/kotlin'
