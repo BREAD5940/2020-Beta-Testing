@@ -60,18 +60,18 @@ object Network {
     fun update() {
         with(DriveSubsystem) {
             flAngle.setDouble(flModule.state.angle.degrees)
-//            frAngle.setDouble(frModule.state.angle.degrees)
+            frAngle.setDouble(frModule.state.angle.degrees)
             brAngle.setDouble(brModule.state.angle.degrees)
             blAngle.setDouble(blModule.state.angle.degrees)
 
             flAzimuthError.setDouble(flModule.periodicIO.lastError.degrees)
-//            frAzimuthError.setDouble(frModule.periodicIO.lastError.degrees)
+            frAzimuthError.setDouble(frModule.periodicIO.lastError.degrees)
             brAzimuthError.setDouble(brModule.periodicIO.lastError.degrees)
             blAzimuthError.setDouble(blModule.periodicIO.lastError.degrees)
 
             val volts = RobotController.getBatteryVoltage()
             flAzimuthOutput.setDouble(flModule.periodicIO.lastAzimuthOutput * volts)
-//            frAzimuthOutput.setDouble(frModule.periodicIO.lastAzimuthOutput * volts)
+            frAzimuthOutput.setDouble(frModule.periodicIO.lastAzimuthOutput * volts)
             brAzimuthOutput.setDouble(brModule.periodicIO.lastAzimuthOutput * volts)
             blAzimuthOutput.setDouble(blModule.periodicIO.lastAzimuthOutput * volts)
         }
