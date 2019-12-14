@@ -20,19 +20,21 @@ val plant = LinearSystem.createElevatorSystem(
         12.0
 )
 
+val kDt = 0.001
+
 object ElevatorController : LinearSystemLoop<N2, N1, N1>(
         Nat.N2(), Nat.N1(), Nat.N1(),
         plant,
         LinearQuadraticRegulator(
                 Nat.N2(), Nat.N1(), plant,
-                MatBuilder<N2, N1>(Nat.N2(), Nat.N1()).fill(0.02, 0.2),
+                MatBuilder<N2, N1>(Nat.N2(), Nat.N1()).fill(0.1, 0.2),
                 MatBuilder<N1, N1>(Nat.N1(), Nat.N1()).fill(12.0),
-                0.020
+                kDt
         ),
         KalmanFilter(
                 Nat.N2(), Nat.N1(), Nat.N1(), plant,
                 MatBuilder<N2, N1>(Nat.N2(), Nat.N1()).fill(0.05, 0.5),
                 MatBuilder<N1, N1>(Nat.N1(), Nat.N1()).fill(0.0001),
-                0.020
+                kDt
         )
 )

@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.XboxController
 import edu.wpi.first.wpilibj2.command.Command
 import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.robot.subsystems.superstructure.ZeroSuperStructureRoutine
+import frc.robot.subsystems.superstructure.controller.ElevatorController
 import frc.robot.subsystems.superstructure.controller.ElevatorSSTest
 import org.ghrobotics.lib.commands.sequential
 import org.ghrobotics.lib.wrappers.hid.*
@@ -15,6 +16,7 @@ object Controls {
 
         button(kX).change(ElevatorSSTest())
         button(kY).changeOn(ZeroSuperStructureRoutine())
+        button(kA).changeOn { ElevatorController }
     }
 
     val operatorWPIJoystick = XboxController(1)

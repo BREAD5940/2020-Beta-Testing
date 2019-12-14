@@ -44,7 +44,8 @@ class ElevatorSSTest: FalconCommand(Superstructure, Elevator) {
 //        ElevatorController.correct(MatBuilder<N2, N1>(Nat.N2(), Nat.N1()).fill(state.position.value, state.velocity.value))
         ElevatorController.predict(0.020)
 
-        val voltage = ElevatorController.getU(0)
+        var voltage = ElevatorController.getU(0)
+        voltage = voltage.coerceIn(-2.0, 2.0)
         Elevator.wantsLowGear = false
         Elevator.wantedState = WantedState.Voltage(voltage.volts)
     }
