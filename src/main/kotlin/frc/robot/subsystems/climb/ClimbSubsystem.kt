@@ -2,9 +2,11 @@ package frc.robot.subsystems.climb
 
 import com.revrobotics.CANSparkMaxLowLevel
 import edu.wpi.first.wpilibj.SpeedController
-import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.Subsystem
+//import edu.wpi.first.wpilibj2.command.Command
+//import edu.wpi.first.wpilibj2.command.Subsystem
 import frc.robot.subsystems.superstructure.Proximal
+import frc.robot.subsystems.superstructure.Superstructure
+import frc.robot.subsystems.superstructure.Wrist
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.*
@@ -25,7 +27,7 @@ object ClimbSubsystem : FalconSubsystem(){
         encoder.resetPosition(zero) //setting to zero
         encoder.canEncoder.positionConversionFactor = -1.0 //inverting
     }
-    class StiltSend(val stiltHeight : SIUnit <Meter>) : Command {
+    class StiltSend(val stiltHeight : SIUnit <Meter>) {
         fun initalize() {
             ClimbSubsystem.habClimberStilt.setPosition(stiltHeight)
         }
@@ -33,9 +35,7 @@ object ClimbSubsystem : FalconSubsystem(){
             return (ClimbSubsystem.habClimberStilt.encoder.position -stiltHeight).absoluteValue < 0.5.inches
         }
 
-        override fun getRequirements(): MutableSet<Subsystem> {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
+
     }
     val intakeWheels = FalconSRX(45, DefaultNativeUnitModel)
     //fun intakeHab(val intakeWheels = FalconSRX(45, DefaultNativeUnitModel)){

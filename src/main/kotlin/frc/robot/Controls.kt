@@ -1,7 +1,7 @@
 package frc.robot
 import edu.wpi.first.wpilibj.XboxController
-import edu.wpi.first.wpilibj2.command.Command
-import edu.wpi.first.wpilibj2.command.InstantCommand
+//import edu.wpi.first.wpilibj2.command.Command
+//import edu.wpi.first.wpilibj2.command.InstantCommand
 import frc.robot.subsystems.climb.ClimbSubsystem
 import frc.robot.subsystems.drive.DriveSubsystem
 import frc.robot.subsystems.drive.TestTrajectory
@@ -37,7 +37,8 @@ object Controls {
             //top line is on press and bottom is when you let go of the button
             state({ driverControllerLowLevel.getRawButton(10) }) {
                 button(kA).changeOn { ArmPresets.cargoLow() }
-                button(kX).changeOn { ArmPresets.cargoMid() }
+               // button(kX).changeOn { ArmPresets.cargoMid() }
+                button(kX).changeOn { Vision.VisionGoToTarget() }
                 button(kY).changeOn { ArmPresets.cargoHigh() }
                 if(ArmPresets.hab3 or ArmPresets.hab2){
                     button(kBumperLeft).changeOn { ClimbSubsystem.intakeWheels.setDutyCycle(1.0) }.changeOff { ClimbSubsystem.intakeWheels.setNeutral() }
@@ -50,7 +51,8 @@ object Controls {
             }
             state({ !driverControllerLowLevel.getRawButton(10) }) {
                 button(kA).changeOn { ArmPresets.hatchLow() }
-                button(kX).changeOn { ArmPresets.hatchMid() }
+               // button(kX).changeOn { ArmPresets.hatchMid() }
+                button(kX).changeOn { Vision.VisionGoToTarget() }
                 button(kY).changeOn { ArmPresets.hatchHigh() }
                 if(ArmPresets.hab3 or ArmPresets.hab2){
                     button(kBumperLeft).changeOn { ClimbSubsystem.intakeWheels.setDutyCycle(-1.0) }.changeOff { ClimbSubsystem.intakeWheels.setNeutral() }
@@ -80,9 +82,9 @@ object Controls {
             }
         }
 
-        private fun Command.andThen(block: () -> Unit) = sequential { +this@andThen; +InstantCommand(Runnable(block)) }
-        fun update() {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        }
+//        private fun Command.andThen(block: () -> Unit) = sequential { +this@andThen; +InstantCommand(Runnable(block)) }
+//        fun update() {
+//            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//        }
     }
 

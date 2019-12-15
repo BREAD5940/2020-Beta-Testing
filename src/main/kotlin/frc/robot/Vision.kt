@@ -1,38 +1,62 @@
 package frc.robot
+import edu.wpi.cscore.VideoMode
 import edu.wpi.first.networktables.NetworkTableEntry
 import edu.wpi.first.networktables.NetworkTableInstance
 import edu.wpi.first.wpilibj.geometry.Rotation2d
+import frc.robot.subsystems.drive.DriveCommand
 import frc.robot.subsystems.drive.DriveSubsystem
+import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.mathematics.units.SIUnit
 import org.ghrobotics.lib.mathematics.units.derived.Radian
 import org.ghrobotics.lib.mathematics.units.derived.degrees
-
-private val Any.degree: Any
-    get() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+import org.ghrobotics.lib.mathematics.units.pico
+import org.ghrobotics.lib.wrappers.networktables.get
+import java.awt.image.PixelGrabber
+import java.awt.image.PixelInterleavedSampleModel
 
 object Vision {
-
+    var prevError = 0.0
     val table = NetworkTableInstance.getDefault().getTable("limelight")
-        val txAngle = (table.getEntry("tx"))
-    //TODO FIX THIS make it invert the signal
-            val angle = txAngle.degree as Rotation2d
+    val txEntry = table.getEntry("tx")
+    val tx = {  txEntry.getDouble(0.0) }
+    val tLongEntry = table.getEntry("tlong")
+    val tlong = { tLongEntry.getDouble(0.0)}
+    val gyroCurrent = DriveSubsystem.gyro
+    val gyroGo = DriveSubsystem.gyro() + DriveSubsystem.wantedAngle
 
+    class AimAtVisionTarget {
+        val kp = 0.011
+        var currentTx = 0.0
 
-     class VisionAngle(){
-         val gyroCurrent = DriveSubsystem.gyro
-         val gyroGo = DriveSubsystem.wantedAngle
-         fun initalize() {
-             DriveSubsystem.wantedAngle = angle as Rotation2d
-                    }
+         fun execute() {
 
-         fun isfinished(): Boolean {
-             return angle < 6.degrees
-         }
+            currentTx = tx.invoke()
+            val turn = -currentTx * kp
+            DriveSubsystem.arcadeDrive(0.0, turn)
+            }
+        fun isFinished(): Boolean {
+            return currentTx > 4
+        }
 
+    }
+    class VisionGoToTarget {
+        val tLongWanted = 190.0 //Pixels on screen
+        val kp = 0.0
+        var currentTLong = 0.0
+        var currentTx = 0.0
 
+        fun execute() {
+            currentTLong = tlong.invoke()
+            val error = tLongWanted - currentTLong
+            val forward =  error * 0.0
 
-     }
+            currentTx = tx.invoke()
+            val turn = -currentTx * 0.01
+
+            DriveSubsystem.arcadeDrive(forward, turn)
+
+        }
+    }
+
 }
 

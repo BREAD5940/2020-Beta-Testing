@@ -20,12 +20,12 @@ val wristMotor: FalconSRX<Radian> = falconSRX(33, NativeUnitRotationModel(4096.n
     talonSRX.config_kD(0, 0.1)
 }
 //radian to degree is ~180(3.14)
-class WristPreset(val wristAngle : SIUnit <Radian>) : FalconCommand(Wrist){
+class WristPreset(val wristAngle : SIUnit <Radian>) {
    // val wantedWristRadian = 0
    fun initalize() {
     wristMotor.setPosition(wristAngle)
 }
-    override fun isFinished(): Boolean {
+    fun isFinished(): Boolean {
         return (wristMotor.encoder.position -wristAngle).absoluteValue < 5.degrees
     }
 
