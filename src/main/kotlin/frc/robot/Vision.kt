@@ -24,16 +24,16 @@ import java.awt.image.PixelInterleavedSampleModel
     val gyroCurrent = DriveSubsystem.gyro
     val gyroGo = DriveSubsystem.gyro() + DriveSubsystem.wantedAngle
 
-    class AimAtVisionTarget {
+    class AimAtVisionTarget : FalconCommand(DriveSubsystem) {
         val kp = 0.011
         var currentTx = 0.0
 
-         fun execute() {
+        override fun execute() {
             currentTx = tx.invoke()
             val turn = -currentTx * kp
             DriveSubsystem.arcadeDrive(0.0, turn)
             }
-        fun isFinished(): Boolean {
+       override fun isFinished(): Boolean {
             return currentTx > 4
         }
 

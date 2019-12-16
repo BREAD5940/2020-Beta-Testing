@@ -1,6 +1,8 @@
 package frc.robot.subsystems.drive
 
 import edu.wpi.first.wpilibj.GenericHID
+import edu.wpi.first.wpilibj2.command.Command
+import edu.wpi.first.wpilibj2.command.Subsystem
 import frc.robot.Controls
 import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.commands.FalconSubsystem
@@ -8,9 +10,13 @@ import org.ghrobotics.lib.utils.withDeadband
 import org.ghrobotics.lib.wrappers.hid.getX
 import org.ghrobotics.lib.wrappers.hid.getY
 
-class DriveCommand {
-    fun isFinished() = false
-    fun execute() {
+class DriveCommand : Command {
+    override fun isFinished() = false
+    override fun getRequirements(): MutableSet<Subsystem> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun execute() {
         // negative because xbox is negative Y when pushed forward
         val forward = speedSource() // same as -1 * speedSource.invoke()
         val turn = rotationSource()
@@ -18,7 +24,7 @@ class DriveCommand {
         DriveSubsystem.curvatureDrive(forward, turn, isQuickTurn)
     }
 
-    fun end(interrupted: Boolean) {
+    override fun end(interrupted: Boolean) {
         DriveSubsystem.leftMotor.setNeutral()
         DriveSubsystem.rightMotor.setNeutral()
     }

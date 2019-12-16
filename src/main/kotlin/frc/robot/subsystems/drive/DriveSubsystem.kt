@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry
 import frc.robot.Vision
+import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.mathematics.units.*
 import org.ghrobotics.lib.mathematics.units.derived.degree
 import org.ghrobotics.lib.mathematics.units.derived.degrees
@@ -66,10 +67,10 @@ object DriveSubsystem : FalconWestCoastDrivetrain() {
         TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
     }
     override fun lateInit() {
-        DriveCommand()
+       defaultCommand = DriveCommand()
     }
 
-    class GoToGyroAngle(){
+    class GoToGyroAngle() : FalconCommand(DriveSubsystem){
         //TODO tune the pids
         val kP = 0.9
         val kD = 4.95
@@ -82,7 +83,7 @@ object DriveSubsystem : FalconWestCoastDrivetrain() {
             //TODO ALSO FIX
             Vision.AimAtVisionTarget()
         }
-        fun execute(){
+       override  fun execute(){
             val der = (error - prevError) * kD
             val output = error * kP + der
                                         //Forward + turn

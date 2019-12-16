@@ -24,18 +24,18 @@ object Superstructure : FalconSubsystem() {
             //if high and going higher
             //dose not matter no risk of hitting things
             SequentialCommandGroup(Proximal.ProximalPreset(proximalAnglePreset),
-            ElevatorPresets.elevatorGoToPreset(elevatorHeightPreset),
+            ElevatorPresets.ElevatorGoToPreset(elevatorHeightPreset),
             Wrist.WristPreset(wristAnglePreset), ClimbSubsystem.StiltSend(habYeetPreset)).schedule()
         }
         // if high and going low
         else if(elevater > 40.inches){
             //proximal then wrist then elevator
-            SequentialCommandGroup(Proximal.ProximalPreset(proximalAnglePreset), Wrist.WristPreset(wristAnglePreset), ElevatorPresets.elevatorGoToPreset(elevatorHeightPreset)).schedule()
+            SequentialCommandGroup(Proximal.ProximalPreset(proximalAnglePreset), Wrist.WristPreset(wristAnglePreset), ElevatorPresets.ElevatorGoToPreset(elevatorHeightPreset)).schedule()
         }
         //low and going lower/higher heheh
         else {
             //elevator then proximal then wrist
-            SequentialCommandGroup(ElevatorPresets.elevatorGoToPreset(elevatorHeightPreset), Proximal.ProximalPreset(proximalAnglePreset), Wrist.WristPreset(wristAnglePreset)).schedule()
+            SequentialCommandGroup(ElevatorPresets.ElevatorGoToPreset(elevatorHeightPreset), Proximal.ProximalPreset(proximalAnglePreset), Wrist.WristPreset(wristAnglePreset)).schedule()
         }
 
 

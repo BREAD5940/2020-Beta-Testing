@@ -37,16 +37,16 @@ object Elevator : FalconSubsystem() {
 
     }
 
-    val Follower1 = FalconSRX(22, DefaultNativeUnitModel)
-    val Follower2 = FalconSRX(23, DefaultNativeUnitModel)
-    val Follower3 = FalconSRX(24, DefaultNativeUnitModel)
+    val follower1 = FalconSRX(22, DefaultNativeUnitModel)
+    val follower2 = FalconSRX(23, DefaultNativeUnitModel)
+    val follower3 = FalconSRX(24, DefaultNativeUnitModel)
 
     override fun lateInit() {
         //when being small brain then look here
-        Follower1.follow(master)
-        Follower1.talonSRX.setInverted(InvertType.OpposeMaster)
-        Follower2.follow(master)
-        Follower3.follow(master)
+        follower1.follow(master)
+        follower1.talonSRX.setInverted(InvertType.OpposeMaster)
+        follower2.follow(master)
+        follower3.follow(master)
         master.talonSRX.configFactoryDefault()
         master.feedbackSensor = FeedbackDevice.CTRE_MagEncoder_Relative
     }
