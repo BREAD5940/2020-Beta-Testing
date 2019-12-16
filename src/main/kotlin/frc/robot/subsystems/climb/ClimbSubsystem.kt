@@ -27,11 +27,11 @@ object ClimbSubsystem : FalconSubsystem(){
         encoder.resetPosition(zero) //setting to zero
         encoder.canEncoder.positionConversionFactor = -1.0 //inverting
     }
-    class StiltSend(val stiltHeight : SIUnit <Meter>) {
-        fun initalize() {
+    class StiltSend(val stiltHeight : SIUnit <Meter>) : FalconCommand(ClimbSubsystem) {
+        override fun initialize() {
             ClimbSubsystem.habClimberStilt.setPosition(stiltHeight)
         }
-        fun isfinished(): Boolean {
+        override fun isFinished(): Boolean {
             return (ClimbSubsystem.habClimberStilt.encoder.position -stiltHeight).absoluteValue < 0.5.inches
         }
 
