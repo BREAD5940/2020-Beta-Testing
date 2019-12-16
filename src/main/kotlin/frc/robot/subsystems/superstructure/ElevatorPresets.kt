@@ -5,13 +5,13 @@ import org.ghrobotics.lib.mathematics.units.Meter
 import org.ghrobotics.lib.mathematics.units.SIUnit
 //TODO check no motors are fighting
 object ElevatorPresets {
-    class elevatorGoToPreset(val height : SIUnit <Meter>) : FalconCommand(Elevator) {
+    class elevatorGoToPreset(val height : SIUnit <Meter>) {
         //TODO Change to real presets
-        override fun initialize() {
-            super.initialize()
+         fun initialize() {
+            //super.initialize()
             Elevator.master.setPosition(height)
         }
-        override fun isFinished(): Boolean {
+         fun isFinished(): Boolean {
             return (Elevator.master.encoder.position -height).absoluteValue < 0.5.inches
         }
     }

@@ -1,5 +1,6 @@
 package frc.robot.subsystems.superstructure
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
+//import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
+//yeet delete ^^^^^
 import frc.robot.subsystems.climb.ClimbSubsystem
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.Meter
@@ -21,7 +22,7 @@ object Superstructure : FalconSubsystem() {
         if(elevater > 40.inches && elevatorHeightPreset > 40.inches){
             //if high and going higher
             //dose not matter no risk of hitting things
-            SequentialCommandGroup( Proximal.ProximalPreset(proximalAnglePreset),
+            Sequential(Proximal.ProximalPreset(proximalAnglePreset),
             ElevatorPresets.elevatorGoToPreset(elevatorHeightPreset),
             Wrist.WristPreset(wristAnglePreset), ClimbSubsystem.StiltSend(habYeetPreset)).schedule()
         }
@@ -30,7 +31,7 @@ object Superstructure : FalconSubsystem() {
             //proximal then wrist then elevator
             SequentialCommandGroup(Proximal.ProximalPreset(proximalAnglePreset), Wrist.WristPreset(wristAnglePreset), ElevatorPresets.elevatorGoToPreset(elevatorHeightPreset)).schedule()
         }
-        //low and going lower/higher
+        //low and going lower/higher heheh
         else {
             //elevator then proximal then wrist
             SequentialCommandGroup(ElevatorPresets.elevatorGoToPreset(elevatorHeightPreset), Proximal.ProximalPreset(proximalAnglePreset), Wrist.WristPreset(wristAnglePreset)).schedule()

@@ -14,7 +14,7 @@ import org.ghrobotics.lib.wrappers.networktables.get
 import java.awt.image.PixelGrabber
 import java.awt.image.PixelInterleavedSampleModel
 
-object Vision {
+    object Vision {
     var prevError = 0.0
     val table = NetworkTableInstance.getDefault().getTable("limelight")
     val txEntry = table.getEntry("tx")
@@ -29,7 +29,6 @@ object Vision {
         var currentTx = 0.0
 
          fun execute() {
-
             currentTx = tx.invoke()
             val turn = -currentTx * kp
             DriveSubsystem.arcadeDrive(0.0, turn)
