@@ -38,13 +38,13 @@ import java.awt.image.PixelInterleavedSampleModel
         }
 
     }
-    class VisionGoToTarget {
+    class VisionGoToTarget: FalconCommand(DriveSubsystem) {
         val tLongWanted = 190.0 //Pixels on screen
         val kp = 0.0
         var currentTLong = 0.0
         var currentTx = 0.0
 
-        fun execute() {
+       override fun execute() {
             currentTLong = tlong.invoke()
             val error = tLongWanted - currentTLong
             val forward =  error * 0.0

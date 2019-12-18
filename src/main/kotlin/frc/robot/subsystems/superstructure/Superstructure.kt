@@ -3,6 +3,7 @@ package frc.robot.subsystems.superstructure
 //yeet delete ^^^^^
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup
 import frc.robot.subsystems.climb.ClimbSubsystem
+import org.ghrobotics.lib.commands.FalconCommand
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.Meter
 import org.ghrobotics.lib.mathematics.units.SIUnit
@@ -12,7 +13,14 @@ import org.ghrobotics.lib.mathematics.units.inches
 
 object Superstructure : FalconSubsystem() {
 
-    fun goToPreset(elevatorHeightPreset : SIUnit <Meter> , proximalAnglePreset : SIUnit <Radian> , wristAnglePreset : SIUnit <Radian>, habYeetPreset : SIUnit <Meter>)  {
+    class PresetCommand(vararg commands: FalconCommand) : SequentialCommandGroup() {
+        //Used to tell if running
+        init {
+            addCommands(*commands)
+        }
+    }
+
+    fun goToPreset(elevatorHeightPreset : SIUnit <Meter> , proximalAnglePreset : SIUnit <Radian> , wristAnglePreset : SIUnit <Radian>, habYeetPreset : SIUnit <Meter>) {
 
         var elevater = Elevator.master.encoder.position
         var proximal = Proximal.ProximalMaster.encoder.position
@@ -23,61 +31,19 @@ object Superstructure : FalconSubsystem() {
         if(elevater > 40.inches && elevatorHeightPreset > 40.inches){
             //if high and going higher
             //dose not matter no risk of hitting things
-            SequentialCommandGroup(Proximal.ProximalPreset(proximalAnglePreset),
+            PresetCommand(Proximal.ProximalPreset(proximalAnglePreset),
             ElevatorPresets.ElevatorGoToPreset(elevatorHeightPreset),
             Wrist.WristPreset(wristAnglePreset), ClimbSubsystem.StiltSend(habYeetPreset)).schedule()
         }
         // if high and going low
         else if(elevater > 40.inches){
             //proximal then wrist then elevator
-            SequentialCommandGroup(Proximal.ProximalPreset(proximalAnglePreset), Wrist.WristPreset(wristAnglePreset), ElevatorPresets.ElevatorGoToPreset(elevatorHeightPreset)).schedule()
+            PresetCommand(Proximal.ProximalPreset(proximalAnglePreset), Wrist.WristPreset(wristAnglePreset), ElevatorPresets.ElevatorGoToPreset(elevatorHeightPreset)).schedule()
         }
         //low and going lower/higher heheh
         else {
             //elevator then proximal then wrist
-            SequentialCommandGroup(ElevatorPresets.ElevatorGoToPreset(elevatorHeightPreset), Proximal.ProximalPreset(proximalAnglePreset), Wrist.WristPreset(wristAnglePreset)).schedule()
+            PresetCommand(ElevatorPresets.ElevatorGoToPreset(elevatorHeightPreset), Proximal.ProximalPreset(proximalAnglePreset), Wrist.WristPreset(wristAnglePreset)).schedule()
         }
-
-
-    }
-
-    //private fun SequentialCommandGroup(proximalPreset: Proximal.ProximalPreset, elevatorGoToPreset: ElevatorPresets.elevatorGoToPreset, wristPreset: Wrist.WristPreset, habClimberStilt: Unit): SequentialCommandGroup {
-
-
-
-
-    class cargoPresets() {
-
-        //    SequentialCommandGroup(Proximal.ProximalPreset(ProximalAngle = 90.degrees),
-//    Wrist.wristPreset(WristAngle = 10.degrees),
-//    ElevatorPresets.elevatorGoToPreset(height = 5.inches)).schedule()
-//
-        fun low() {
-
-        }
-
-        fun mid() {
-
-        }
-
-        fun high() {
-
-        }
-    }
-
-    class hatchPresets() {
-
-        fun low() {
-
-        }
-
-        fun mid() {
-
-        }
-
-        fun high() {
-
-        }
-
     }
 }
