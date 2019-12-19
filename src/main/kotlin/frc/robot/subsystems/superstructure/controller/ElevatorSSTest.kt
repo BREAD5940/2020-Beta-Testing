@@ -70,15 +70,15 @@ class ElevatorSSTest(val targetHeight: SIUnit<Meter>): FalconCommand(Superstruct
 
         val profile = TrapezoidProfile(
                 constraints, TrapezoidProfile.State(targetHeight.inMeters(), 0.0),
-                TrapezoidProfile.State(state.position.value, state.velocity.value)
+                TrapezoidProfile.State(ElevatorController.getNextR(0), ElevatorController.getNextR(1))
         )
 
         val target = profile.calculate(0.0050)
 
         System.out.println("current ${state.position.value} target ${target.position}")
 
-//        ElevatorController.nextR = MatBuilder<N2, N1>(Nat.N2(), Nat.N1()).fill(target.position, target.velocity)
-        ElevatorController.nextR = MatBuilder<N2, N1>(Nat.N2(), Nat.N1()).fill(targetHeight.inMeters(), 0.0)
+        ElevatorController.nextR = MatBuilder<N2, N1>(Nat.N2(), Nat.N1()).fill(target.position, target.velocity)
+//        ElevatorController.nextR = MatBuilder<N2, N1>(Nat.N2(), Nat.N1()).fill(targetHeight.inMeters(), 0.0)
 
         val y = ElevatorController.plant.calculateY(
                 MatBuilder<N2, N1>(Nat.N2(), Nat.N1()).fill(state.position.value, state.velocity.value),
