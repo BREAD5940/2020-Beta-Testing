@@ -28,7 +28,7 @@ import kotlin.concurrent.timer
 
 class ElevatorSSTest(val targetHeight: SIUnit<Meter>): FalconCommand(Superstructure, Elevator) {
 
-    private val constraints = TrapezoidProfile.Constraints(24.inches.inMeters(), 400.inches.inMeters())
+    private val constraints = TrapezoidProfile.Constraints(8.inches.inMeters(), 8.inches.inMeters())
 
     override fun isFinished(): Boolean {
         return false

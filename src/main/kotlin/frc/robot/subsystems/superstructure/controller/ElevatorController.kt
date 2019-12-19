@@ -14,7 +14,7 @@ import org.ghrobotics.lib.mathematics.units.inches
 
 val plant = LinearSystem.createElevatorSystem(
         DCMotor.getVex775Pro(4),
-        8.0 / 2.2,
+        2.0,
         0.75.inches.inMeters(),
         14.67,
         3.0
@@ -27,7 +27,7 @@ object ElevatorController : LinearSystemLoop<N2, N1, N1>(
         plant,
         LinearQuadraticRegulator(
                 Nat.N2(), Nat.N1(), plant,
-                MatBuilder<N2, N1>(Nat.N2(), Nat.N1()).fill(0.03, 0.15),
+                MatBuilder<N2, N1>(Nat.N2(), Nat.N1()).fill(0.02, 0.15),
                 MatBuilder<N1, N1>(Nat.N1(), Nat.N1()).fill(12.0),
                 kDt
         ),
