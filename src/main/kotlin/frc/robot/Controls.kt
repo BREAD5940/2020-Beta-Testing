@@ -7,6 +7,8 @@ import frc.robot.subsystems.superstructure.ZeroSuperStructureRoutine
 import frc.robot.subsystems.superstructure.controller.ElevatorController
 import frc.robot.subsystems.superstructure.controller.ElevatorSSTest
 import org.ghrobotics.lib.commands.sequential
+import org.ghrobotics.lib.mathematics.units.inch
+import org.ghrobotics.lib.mathematics.units.inches
 import org.ghrobotics.lib.wrappers.hid.*
 
 object Controls {
@@ -14,9 +16,10 @@ object Controls {
     val driverControllerLowLevel = XboxController(0)
     val driverFalconXbox = driverControllerLowLevel.mapControls {
 
-        button(kX).change(ElevatorSSTest())
-        button(kY).changeOn(ZeroSuperStructureRoutine())
-        button(kA).changeOn { ElevatorController }
+        button(kX).change(ElevatorSSTest(10.inches))
+        button(kB).change(ElevatorSSTest(-10.inches))
+//        button(kY).changeOn(ZeroSuperStructureRoutine())
+//        button(kA).changeOn { ElevatorController }
     }
 
     val operatorWPIJoystick = XboxController(1)

@@ -10,10 +10,12 @@ import org.ghrobotics.lib.wrappers.FalconTimedRobot
 
 object Robot : FalconTimedRobot() {
 
-    val isEnabled get() = wrappedValue.isEnabled
+    public val isEnabled get() = wrappedValue.isEnabled
 
     override fun robotInit() {
         Network // at the top because s3ndable choosers need to be instantiated
+
+        ElevatorController
 
         // + for subsystems
         +DriveSubsystem
