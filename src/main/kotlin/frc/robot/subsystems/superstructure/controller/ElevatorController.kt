@@ -12,28 +12,28 @@ import edu.wpi.first.wpiutil.math.numbers.N2
 import org.ghrobotics.lib.mathematics.units.inMeters
 import org.ghrobotics.lib.mathematics.units.inches
 
-val plant = LinearSystem.createElevatorSystem(
+val plant: LinearSystem<N2, N1, N1> = LinearSystem.createElevatorSystem(
         DCMotor.getVex775Pro(4),
-        2.0,
+        8.0,
         0.75.inches.inMeters(),
         14.67,
-        3.0
+        8.0
 )
 
-val kDt = 0.005
+const val kDt = 0.020
 
 object ElevatorController : LinearSystemLoop<N2, N1, N1>(
         Nat.N2(), Nat.N1(), Nat.N1(),
         plant,
         LinearQuadraticRegulator(
                 Nat.N2(), Nat.N1(), plant,
-                MatBuilder<N2, N1>(Nat.N2(), Nat.N1()).fill(0.02, 0.15),
+                MatBuilder<N2, N1>(Nat.N2(), Nat.N1()).fill(0.08, 1.0),
                 MatBuilder<N1, N1>(Nat.N1(), Nat.N1()).fill(12.0),
                 kDt
         ),
         KalmanFilter(
                 Nat.N2(), Nat.N1(), Nat.N1(), plant,
-                MatBuilder<N2, N1>(Nat.N2(), Nat.N1()).fill(0.1, 10.0),
+                MatBuilder<N2, N1>(Nat.N2(), Nat.N1()).fill(0.05, 200.0),
                 MatBuilder<N1, N1>(Nat.N1(), Nat.N1()).fill(0.0001),
                 kDt
         )

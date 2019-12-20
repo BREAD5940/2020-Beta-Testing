@@ -28,7 +28,7 @@ import kotlin.concurrent.timer
 
 class ElevatorSSTest(val targetHeight: SIUnit<Meter>): FalconCommand(Superstructure, Elevator) {
 
-    private val constraints = TrapezoidProfile.Constraints(8.inches.inMeters(), 8.inches.inMeters())
+    private val constraints = TrapezoidProfile.Constraints(20.inches.inMeters(), 250.inches.inMeters())
 
     override fun isFinished(): Boolean {
         return false
@@ -39,19 +39,24 @@ class ElevatorSSTest(val targetHeight: SIUnit<Meter>): FalconCommand(Superstruct
 
     override fun initialize() {
         Elevator.motor.encoder.resetPosition(0.meters)
+        ElevatorController.nextR = MatBuilder<N2, N1>(Nat.N2(), Nat.N1()).fill(0.0, 0.0)
 //        list = ""
 //        list = "time, xHat(0), xHat(1), position(encoder), velocity(encoder)"
 
         ElevatorController.reset()
 
 //        notifier.startPeriodic(0.005)
-        job = GlobalScope.launchFrequency(200) { execute0() }
-        job.start()
+//        job = GlobalScope.launchFrequency((1.0 / kDt).toInt()) { execute0() }
+//        job.start()
 
         ElevatorController.enable()
 
         list = ArrayList<String>()
         list.add("time, xHat(0), xHat(1), voltage, position(encoder), velocity(encoder), refPos, refVel")
+    }
+
+    override fun execute() {
+        execute0()
     }
 
     private fun execute0() {
@@ -73,7 +78,7 @@ class ElevatorSSTest(val targetHeight: SIUnit<Meter>): FalconCommand(Superstruct
                 TrapezoidProfile.State(ElevatorController.getNextR(0), ElevatorController.getNextR(1))
         )
 
-        val target = profile.calculate(0.0050)
+        val target = profile.calculate(0.00505)
 
         System.out.println("current ${state.position.value} target ${target.position}")
 
@@ -87,7 +92,7 @@ class ElevatorSSTest(val targetHeight: SIUnit<Meter>): FalconCommand(Superstruct
         ElevatorController.correct(y)
 
 //        ElevatorController.correct(MatBuilder<N2, N1>(Nat.N2(), Nat.N1()).fill(state.position.value, state.velocity.value))
-        ElevatorController.predict(0.020)
+        ElevatorController.predict(kDt)
 
         var voltage = ElevatorController.getU(0)
 
@@ -101,8 +106,6 @@ class ElevatorSSTest(val targetHeight: SIUnit<Meter>): FalconCommand(Superstruct
 
         list.add(data)
 
-        SmartDashboard.putString("elevatorJson", gson.toJson(list))
-
 //        SmartDashboard.putStringArray("elevatorData", list.toTypedArray())
 
 //        voltage = voltage.coerceIn(-4.0, 4.0)
@@ -113,7 +116,9 @@ class ElevatorSSTest(val targetHeight: SIUnit<Meter>): FalconCommand(Superstruct
     override fun end(interrupted: Boolean) {
         Elevator.wantedState = WantedState.Nothing
         ElevatorController.disable()
-        job.cancel()
+//        job.cancel()
+
+        SmartDashboard.putString("elevatorJson", gson.toJson(list))
     }
 
     private var gson = Gson()
