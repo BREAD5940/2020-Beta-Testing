@@ -54,7 +54,8 @@ open class Mk2SwerveModule(
         driveMotor.canSparkMax.apply {
             setSmartCurrentLimit(60)
             setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 500)
-            setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 3)
+            setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 3)
+            setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 20)
         }
 
         azimuthMotor.canSparkMax.restoreFactoryDefaults()

@@ -48,7 +48,7 @@ class HolomonicDriveCommand : FalconCommand(DriveSubsystem) {
         // Max duty cycle is 1.0
 //        SwerveDriveKinematics.normalizeWheelSpeeds(speeds,1.0)
 
-        println("speeds ${speeds.toString2()}")
+//        println("speeds ${speeds.toString2()}")
 
         DriveSubsystem.periodicIO.output = SwerveDriveOutput.Percent(speeds)
 

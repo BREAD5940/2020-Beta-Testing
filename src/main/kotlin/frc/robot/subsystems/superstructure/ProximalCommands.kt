@@ -12,11 +12,11 @@ import kotlin.math.roundToInt
 
 class ClosedLoopProximalMove(val targetPosition: SIUnit<Radian> = 0.radians): FalconCommand(Proximal) {
 
-    private val controller = PIDController(0.1, 0.0, 0.0)
+    private val controller = PIDController(2.0, 0.0, 0.0)
 
     companion object {
         private val feedforward = ArmFeedforward(0.3, 0.3, 3.9, 0.08)
-        private val constraints = TrapezoidProfile.Constraints(30.degrees.inRadians(), 60.degrees.inRadians())
+        private val constraints = TrapezoidProfile.Constraints(90.degrees.inRadians(), 200.degrees.inRadians())
     }
 
     lateinit var lastSetpoint: TrapezoidProfile.State
