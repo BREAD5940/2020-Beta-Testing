@@ -17,10 +17,16 @@ class ClosedLoopProximalMove(val targetPosition: SIUnit<Radian> = 0.radians): Fa
         private val constraints = TrapezoidProfile.Constraints(30.degrees.inRadians(), 60.degrees.inRadians())
     }
 
+    override fun initialize() {
+        controller.setGoal(targetPosition.inRadians())
+    }
+
     override fun execute() {
         val position = Proximal.position
         Proximal.voltageOutput = controller.calculate(position.inRadians(), targetPosition.inRadians()).volts
             + feedforward.calculate(Proximal.position.inRadians(), controller.setpoint.velocity)
     }
+
+    override fun isFinished() = controller.atGoal()
 
 }
