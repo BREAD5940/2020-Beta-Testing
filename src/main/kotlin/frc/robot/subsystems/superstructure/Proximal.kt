@@ -4,9 +4,11 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice
 import com.ctre.phoenix.motorcontrol.InvertType
 import edu.wpi.first.wpilibj.controller.ArmFeedforward
 import edu.wpi.first.wpilibj.controller.PIDController
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import org.ghrobotics.lib.commands.FalconSubsystem
 import org.ghrobotics.lib.mathematics.units.SIUnit
 import org.ghrobotics.lib.mathematics.units.derived.Volt
+import org.ghrobotics.lib.mathematics.units.derived.inDegrees
 import org.ghrobotics.lib.mathematics.units.derived.radians
 import org.ghrobotics.lib.mathematics.units.derived.volts
 import org.ghrobotics.lib.mathematics.units.nativeunit.DefaultNativeUnitModel
@@ -42,4 +44,9 @@ object Proximal: FalconSubsystem() {
         set(value) {
             master.setVoltage(value, 0.volts)
         }
+
+    override fun periodic() {
+        SmartDashboard.putNumber("pos", position.inDegrees())
+        SmartDashboard.putNumber("volt", voltageOutput.value)
+    }
 }
