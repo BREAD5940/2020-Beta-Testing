@@ -23,8 +23,15 @@ import org.ghrobotics.lib.subsystems.drive.FalconWestCoastDrivetrain
 import org.ghrobotics.lib.utils.Source
 import java.rmi.activation.ActivationGroupDesc
 
-
 object DriveSubsystem : FalconWestCoastDrivetrain() {
+    override fun activateEmergency() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun recoverFromEmergency() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     lateinit var wantedAngle: Rotation2d
     override val controller = RamseteController(2.0,0.7)
     private val gyro_ = AHRS(SPI.Port.kMXP)
@@ -43,7 +50,7 @@ object DriveSubsystem : FalconWestCoastDrivetrain() {
         outputInverted = true // TODO Replace me with what you found works for the leftFollower
         follow(leftMotor)
     }
-    override val odometry: DifferentialDriveOdometry = DifferentialDriveOdometry(kinematics, gyro()).apply {
+    override val odometry: DifferentialDriveOdometry = DifferentialDriveOdometry(gyro(), Pose2d()).apply {
         resetPosition(Pose2d())
     }
     override val rightCharacterization = SimpleMotorFeedforward(1.49,2.66,0.918)
@@ -59,13 +66,6 @@ object DriveSubsystem : FalconWestCoastDrivetrain() {
         follow(rightMotor)
     }
 
-    override fun activateEmergency() {
-        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun recoverFromEmergency() {
-        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
-    }
     override fun lateInit() {
        defaultCommand = DriveCommand()
     }

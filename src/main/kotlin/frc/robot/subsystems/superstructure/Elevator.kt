@@ -48,7 +48,7 @@ object Elevator : FalconSubsystem() {
         follower2.follow(master)
         follower3.follow(master)
         master.talonSRX.configFactoryDefault()
-        master.feedbackSensor = FeedbackDevice.CTRE_MagEncoder_Relative
+//        master.feedbackDevice = FeedbackDevice.CTRE_MagEncoder_Relative
     }
 
     fun setLowGear() {
